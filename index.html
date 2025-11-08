@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baumback Child Touching Simulator 3d</title>
+    <title>Backbomb</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <style>
         html, body { overflow: hidden; }
@@ -95,18 +95,18 @@
     </style>
 </head>
 <body>
-    <h1>Baumback Child Touching Simulator 3d</h1>
-    <p>Click tiles to reveal children. Find a cop and lose!</p>
+    <h1>Backbomb/h1>
+    <p>Click tiles to reveal diamonds. Find a bomb and lose!</p>
     <div class="grid" id="grid"></div>
-    <p id="status">Children Kidnapped: 0</p>
+    <p id="status">Money: 0</p>
 
     <div id="resetContainer">
-        <button id="resetButton">Touch Kids Again?</button>
+        <button id="resetButton">Replay?</button>
     </div>
 
     <div id="endScreen" class="end-screen hidden">
         <h2 id="endMessage"></h2>
-        <button id="endResetButton" class="hidden">Touch Kids Again?</button>
+        <button id="endResetButton" class="hidden">Replay?</button>
     </div>
 
     <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1002;"></canvas>
@@ -153,13 +153,13 @@
 
             if (index === mineIndex) {
                 cell.classList.add("mine");
-                cell.innerHTML = "👮";
+                cell.innerHTML = "💣";
                 if (balance > 5) {
                     balance = Math.floor(balance / 2);
                 } else {
                     balance = 0;
                 }
-                document.getElementById("status").innerText = `The cops caught you! Children Kidnapped: ${balance}`;
+                document.getElementById("status").innerText = `The cops caught you! Money: $${balance}`;
                 hitMine = true;
                 freezeBoard();
                 
@@ -170,10 +170,10 @@
                 }
             } else {
                 cell.classList.add("revealed");
-                cell.innerHTML = "👶";
+                cell.innerHTML = "💎";
                 revealedCells++;
                 balance += 1;
-                document.getElementById("status").innerText = `Children Kidnapped: ${balance}`;
+                document.getElementById("status").innerText = `Money: $${balance}`;
                 checkVictory();
             }
         }
@@ -184,7 +184,7 @@
 
         function checkVictory() {
             if (revealedCells === gridSize * gridSize - 1) {
-                document.getElementById("endMessage").innerText = "Lucky You! You Touched ALL The Children!";
+                document.getElementById("endMessage").innerText = "You found all the gems!";
                 document.getElementById("endScreen").classList.remove("hidden");
                 gameEnded = true;
                 showEndResetButton();
@@ -200,7 +200,7 @@
 
         function checkEndGame() {
             if (balance <= 0) {
-                document.getElementById("endMessage").innerText = "The cops took back ALL the children";
+                document.getElementById("endMessage").innerText = "You have lost ALL your money";
                 document.getElementById("endScreen").classList.remove("hidden");
                 gameEnded = true;
                 showEndResetButton();
@@ -232,7 +232,7 @@
             
             generateMine();
             createGrid();
-            document.getElementById("status").innerText = `Children Kidnapped: ${balance}`;
+            document.getElementById("status").innerText = `Money: $${balance}`;
             document.getElementById("endScreen").classList.add("hidden");
 
             document.getElementById("resetContainer").style.display = "none";
