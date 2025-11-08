@@ -230,8 +230,18 @@
         }
 
         function checkVictory() {
-            // Updated victory condition: Total tiles (25) - Bomb (1) - Adjacent Safe Tiles (8) = 16 diamond tiles
-            if (revealedCells === gridSize * gridSize - 9) {
+            let totalCells = gridSize * gridSize;
+            let tilesAdjacentToMine = 0;
+
+            for (let i = 0; i < totalCells; i++) {
+                if (isAdjacent(i, mineIndex)) {
+                    tilesAdjacentToMine++;
+                }
+            }
+
+            const totalDiamondTiles = totalCells - 1 - tilesAdjacentToMine;
+
+            if (revealedCells === totalDiamondTiles) {
                 document.getElementById("endMessage").innerText = "You found all the gems!";
                 document.getElementById("endScreen").classList.remove("hidden");
                 gameEnded = true;
