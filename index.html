@@ -190,7 +190,7 @@
                     // Check if adjacent, not already revealed, and not the bomb itself
                     if (isAdjacent(cIndex, mineIndex) && !c.classList.contains("revealed") && !c.classList.contains("safe") && cIndex !== mineIndex) {
                         c.classList.add("safe");
-                        c.innerHTML = ""; // No emoji
+                        c.innerHTML = "";
                         c.style.transform = "rotateY(180deg)"; // Flip adjacent cells
                     }
                 });
@@ -200,7 +200,7 @@
                 } else {
                     balance = 0;
                 }
-                document.getElementById("status").innerText = `KABOOM! You lost some money. Money: $${balance}`;
+                document.getElementById("status").innerText = `You clicked the bomb! Money: $${balance}`;
                 hitMine = true;
                 freezeBoard();
                 
@@ -213,8 +213,7 @@
                 // Case 2: Hit a Safe/Adjacent Tile (Yellow, no diamond)
                 cell.classList.add("safe");
                 cell.innerHTML = ""; // No emoji
-                document.getElementById("status").innerText = `Close call! Safe Tile! Money: $${balance}`;
-                // DO NOT increase balance or revealedCells
+                document.getElementById("status").innerText = `Money: $${balance}`;
             } else {
                 // Case 3: Hit a Diamond Tile 💎
                 cell.classList.add("revealed");
