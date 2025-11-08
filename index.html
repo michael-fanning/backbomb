@@ -95,7 +95,7 @@
     </style>
 </head>
 <body>
-    <h1>Backbomb/h1>
+    <h1>Backbomb<h1>
     <p>Click tiles to reveal diamonds. Find a bomb and lose!</p>
     <div class="grid" id="grid"></div>
     <p id="status">Money: 0</p>
@@ -128,7 +128,7 @@
         });
 
         function generateMine() {
-            mineIndex = Math.floor(Math.random() * (gridSize * gridSize));
+            mineIndex = 0;//Math.floor(Math.random() * (gridSize * gridSize));
         }
 
         function createGrid() {
