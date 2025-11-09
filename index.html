@@ -153,7 +153,6 @@
                 
                 // If the tile is next to (or on top of) a bomb
                 if (rowDiff <= 1 && colDiff <= 1) {
-                    // Important: We return true if adjacent. The calling function checks if it's the mine itself.
                     return true;
                 }
             }
@@ -273,10 +272,19 @@
             document.querySelectorAll(".cell").forEach(cell => cell.style.pointerEvents = "none");
         }
     
+        // 🌟 FIX: Recalculate the true number of non-adjacent diamond tiles for the win condition
         function checkVictory() {
-            // Total tiles minus the fixed number of mines
-            const totalDiamondTiles = (gridSize * gridSize) - mineCount; 
+            let totalDiamondTiles = 0;
+            const totalCells = gridSize * gridSize;
+            
+            // Loop through all cells to find the count of true diamond tiles (not mines, not adjacent to a mine)
+            for (let i = 0; i < totalCells; i++) {
+                if (!mineIndices.includes(i) && !isAdjacent(i)) {
+                    totalDiamondTiles++;
+                }
+            }
     
+            // Check if the number of revealed green diamond tiles matches the required count
             if (revealedCells === totalDiamondTiles) {
                 document.getElementById("endMessage").innerText = "You found all the gems!";
                 document.getElementById("endScreen").classList.remove("hidden");
@@ -340,7 +348,6 @@
         document.addEventListener('DOMContentLoaded', (event) => {
             document.getElementById("resetButton").addEventListener("click", resetGame);
             document.getElementById("endResetButton").addEventListener("click", resetGame);
-            // Mine generation is now skipped here, as it waits for the first click.
             createGrid();
         });
     </script>
