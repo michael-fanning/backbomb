@@ -13,7 +13,7 @@
     <div class="grid" id="grid"></div>
     <p id="status">Money: $0</p>
 
-    <div id="resetContainer">
+    <div id="resetContainer" style="display: none;">
         <button id="resetButton">Replay?</button>
     </div>
 
@@ -42,7 +42,7 @@
             useWorker: true
         });
     
-        //Checks if a tile is adjacent to a bomb.
+        // Checks if a tile is adjacent to a bomb.
         function isAdjacent(index) {
             for (const bombIndex of mineIndices) {
                 const row = Math.floor(index / gridSize);
@@ -53,7 +53,7 @@
                 const rowDiff = Math.abs(row - bombRow);
                 const colDiff = Math.abs(col - bombCol);
                 
-                //If tile is next to a bomb
+                // If tile is next to a bomb
                 if (rowDiff <= 1 && colDiff <= 1) {
                     return true;
                 }
@@ -61,20 +61,11 @@
             return false;
         }
     
-    
-        //Places mines, excluding the first clicked tile
+        // Places mines, excluding the first clicked tile
         function initializeMines(excludeIndex = -1) { 
             mineIndices = [];
             const totalCells = gridSize * gridSize;
             const possibleMineIndices = new Set();
-        
-            /**** TEMPORARY TEST CODE START: Force specific mine placement for testing safe click on tile 0 ***
-            if (excludeIndex === 0 && mineCount > 1) {
-                // Example fixed locations (right column)
-                mineIndices = [4, 9, 14, 19, 24].slice(0, mineCount); 
-                return; 
-            }
-            // *** TEMPORARY TEST CODE END ***/
             
             // 1. Fill Set with all possible indices, excluding the first clicked tile
             for (let i = 0; i < totalCells; i++) {
@@ -105,6 +96,29 @@
                 grid.appendChild(cell);
             }
         }
+
+        /**
+         * Reveals all mines and adjacent safe tiles on the board.
+         * Used for both win and loss conditions.
+         */
+        function revealBoardOnEnd() {
+            document.querySelectorAll(".cell").forEach(c => {
+                const cIndex = parseInt(c.dataset.index);
+                const isTileAdjacent = isAdjacent(cIndex);
+
+                if (mineIndices.includes(cIndex)) {
+                    // Reveal mines
+                    c.classList.add("mine");
+                    c.innerHTML = "💣";
+                    c.style.transform = "rotateY(180deg)";
+                } else if (isTileAdjacent && !c.classList.contains("revealed")) {
+                    // Reveal adjacent safe tiles (yellow) if they haven't been revealed as a diamond
+                    c.classList.add("safe");
+                    c.innerHTML = "";
+                    c.style.transform = "rotateY(180deg)"; 
+                }
+            });
+        }
     
         function revealCell(index) {
             if (gameEnded) return;
@@ -125,20 +139,8 @@
             if (isMine) {
                 // Case 1: Hit the Bomb 💣
                 
-                // Reveal all mines and adjacent safe tiles
-                document.querySelectorAll(".cell").forEach(c => {
-                    const cIndex = parseInt(c.dataset.index);
-                    if (mineIndices.includes(cIndex)) {
-                        c.classList.add("mine");
-                        c.innerHTML = "💣";
-                        c.style.transform = "rotateY(180deg)";
-                    } else if (isAdjacent(cIndex) && !c.classList.contains("revealed") && !c.classList.contains("safe")) {
-                        // Reveal yellow adjacent tiles
-                        c.classList.add("safe");
-                        c.innerHTML = "";
-                        c.style.transform = "rotateY(180deg)"; 
-                    }
-                });
+                // Call function to reveal the board on loss
+                revealBoardOnEnd();
     
                 if (balance > 5) {
                     balance = Math.floor(balance / 2);
@@ -174,7 +176,7 @@
             document.querySelectorAll(".cell").forEach(cell => cell.style.pointerEvents = "none");
         }
     
-        // 🌟 FIX: Recalculate the true number of non-adjacent diamond tiles for the win condition
+        // Win condition now also calls revealBoardOnEnd()
         function checkVictory() {
             let totalDiamondTiles = 0;
             const totalCells = gridSize * gridSize;
@@ -188,11 +190,14 @@
     
             // Check if the number of revealed green diamond tiles matches the required count
             if (revealedCells === totalDiamondTiles) {
-                document.getElementById("endMessage").innerText = "You found all the gems!";
+                document.getElementById("endMessage").innerText = `VICTORY! You found all the gems and won $${balance}!`;
                 document.getElementById("endScreen").classList.remove("hidden");
                 gameEnded = true;
                 showEndResetButton();
                 freezeBoard();
+                
+                // Call function to reveal the board on win
+                revealBoardOnEnd();
     
                 myConfetti({
                     particleCount: 150,
@@ -239,7 +244,7 @@
             document.getElementById("endScreen").classList.add("hidden");
             document.getElementById("resetContainer").style.display = "none";
             document.getElementById("endResetButton").classList.add("hidden"); 
-        
+    
             document.querySelectorAll(".cell").forEach(cell => cell.style.pointerEvents = "auto");
             
             if (typeof myConfetti === 'function') {
