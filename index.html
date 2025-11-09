@@ -131,20 +131,21 @@
         let revealedCells = 0;
         let gameEnded = false;
         let hitMine = false;
-
+        let firstClick = true; // 🌟 FIX 1: Add firstClick flag
+    
         const myCanvas = document.getElementById('confetti-canvas');
         const myConfetti = confetti.create(myCanvas, {
             resize: true,
             useWorker: true
         });
-
-        // FUNCTION: Checks for 8 adjacent cells
+    
+        // FUNCTION: Checks for 8 adjacent cells (No change)
         function isAdjacent(index, bombIndex) {
             const row = Math.floor(index / gridSize);
             const col = index % gridSize;
             const bombRow = Math.floor(bombIndex / gridSize);
             const bombCol = bombIndex % gridSize;
-
+    
             //Check if the distance in rows and columns is 0 or 1.
             const rowDiff = Math.abs(row - bombRow);
             const colDiff = Math.abs(col - bombCol);
@@ -152,17 +153,29 @@
             //It's adjacent if both differences are 0 or 1, AND it's not the bomb itself
             return rowDiff <= 1 && colDiff <= 1 && index !== bombIndex;
         }
-
-
-        function generateMine() {
+    
+    
+        // 🌟 FIX 2 & TEST: Modified generateMine to accept an exclusion index
+        function generateMine(excludeIndex = -1) { 
             let newMineIndex;
+            let totalCells = gridSize * gridSize;
+    
+            // *** TEMPORARY TEST CODE START ***
+            if (excludeIndex === 0) {
+                // If the player clicks tile 0 (top-left), FORCE the mine to tile 24 (bottom-right)
+                mineIndex = 24; 
+                return; 
+            }
+            // *** TEMPORARY TEST CODE END ***
+            
+            // Normal randomization logic, ensuring new mine is not the excluded index
             do {
-                newMineIndex = Math.floor(Math.random() * (gridSize * gridSize));
+                newMineIndex = Math.floor(Math.random() * totalCells);
             } while (newMineIndex === excludeIndex);
             mineIndex = newMineIndex;
         }
-
-        function createGrid() {
+    
+        function createGrid() { // (No change)
             const grid = document.getElementById("grid");
             grid.innerHTML = "";
             for (let i = 0; i < gridSize * gridSize; i++) {
@@ -173,27 +186,28 @@
                 grid.appendChild(cell);
             }
         }
-
+    
+        // 🌟 FIX 3: Added firstClick logic
         function revealCell(index) {
             if (gameEnded) return;
-
+    
             if (firstClick) {
-                // Generate the mine, ensuring it is NOT the tile the player just clicked.
+                // Generate the mine, excluding the tile the player just clicked (index).
                 generateMine(index);
                 firstClick = false;
             }
-
+    
             const cell = document.querySelector(`.cell[data-index='${index}']`);
             // Prevent clicking already revealed/safe cells
             if (!cell || cell.classList.contains("revealed") || cell.classList.contains("safe")) return;
-
+    
             cell.style.transform = "rotateY(180deg)"; //Flip animation
-
+    
             if (index === mineIndex) {
                 // Case 1: Hit the Bomb 💣
                 cell.classList.add("mine");
                 cell.innerHTML = "💣";
-
+    
                 // Automatically reveal adjacent tiles as safe/yellow
                 document.querySelectorAll(".cell").forEach(c => {
                     const cIndex = parseInt(c.dataset.index);
@@ -204,7 +218,7 @@
                         c.style.transform = "rotateY(180deg)"; // Flip adjacent cells
                     }
                 });
-
+    
                 if (balance > 5) {
                     balance = Math.floor(balance / 2);
                 } else {
@@ -234,30 +248,30 @@
                 checkVictory();
             }
         }
-
-        function freezeBoard() {
+    
+        function freezeBoard() { // (No change)
             document.querySelectorAll(".cell").forEach(cell => cell.style.pointerEvents = "none");
         }
-
-        function checkVictory() {
+    
+        function checkVictory() { // (Dynamic victory logic remains the same)
             let totalCells = gridSize * gridSize;
             let tilesAdjacentToMine = 0;
-
+    
             for (let i = 0; i < totalCells; i++) {
                 if (isAdjacent(i, mineIndex)) {
                     tilesAdjacentToMine++;
                 }
             }
-
+    
             const totalDiamondTiles = totalCells - 1 - tilesAdjacentToMine;
-
+    
             if (revealedCells === totalDiamondTiles) {
                 document.getElementById("endMessage").innerText = "You found all the gems!";
                 document.getElementById("endScreen").classList.remove("hidden");
                 gameEnded = true;
                 showEndResetButton();
                 freezeBoard();
-
+    
                 myConfetti({
                     particleCount: 150,
                     spread: 120,
@@ -265,8 +279,8 @@
                 });
             }
         }
-
-        function checkEndGame() {
+    
+        function checkEndGame() { // (No change)
             if (balance <= 0) {
                 document.getElementById("endMessage").innerText = "You lost ALL your money";
                 document.getElementById("endScreen").classList.remove("hidden");
@@ -275,20 +289,21 @@
                 freezeBoard();
             }
         }
-
-        function showResetButton() {
+    
+        function showResetButton() { // (No change)
             if (hitMine && gameEnded == false) {
                 document.getElementById("resetContainer").style.display = "block";
             }
         }
-
-        function showEndResetButton() {
+    
+        function showEndResetButton() { // (No change)
             if (gameEnded) {
                 document.getElementById("endResetButton").classList.remove("hidden");
                 document.getElementById("resetContainer").style.display = "none";
             }
         }
-
+    
+        // 🌟 FIX 4: Reset firstClick flag and remove generateMine call
         function resetGame() {
             revealedCells = 0;
             if (gameEnded) {
@@ -296,7 +311,8 @@
             }
             gameEnded = false;
             hitMine = false; 
-            generateMine();
+            firstClick = true; // Reset flag
+            // generateMine() call removed here.
             createGrid();
             document.getElementById("status").innerText = `Money: $${balance}`;
             document.getElementById("endScreen").classList.add("hidden");
@@ -309,11 +325,12 @@
                 myConfetti.reset();
             }
         }
-
+    
+        // 🌟 FIX 5: Removed initial generateMine call
         document.addEventListener('DOMContentLoaded', (event) => {
             document.getElementById("resetButton").addEventListener("click", resetGame);
             document.getElementById("endResetButton").addEventListener("click", resetGame);
-            generateMine();
+            // generateMine(); <-- REMOVED THIS LINE
             createGrid();
         });
     </script>
