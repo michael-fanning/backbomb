@@ -126,9 +126,9 @@
 
     <script>
         const gridSize = 5;
-        const mineCount = 5; // Controls the number of mines
+        const mineCount = 4;
         let balance = 0;
-        let mineIndices = []; // Holds ALL mine locations
+        let mineIndices = [];
         let revealedCells = 0;
         let gameEnded = false;
         let hitMine = false;
@@ -140,7 +140,7 @@
             useWorker: true
         });
     
-        // FUNCTION: Checks if the index is adjacent to ANY bomb
+        //Checks if a tile is adjacent to a bomb.
         function isAdjacent(index) {
             for (const bombIndex of mineIndices) {
                 const row = Math.floor(index / gridSize);
@@ -151,7 +151,7 @@
                 const rowDiff = Math.abs(row - bombRow);
                 const colDiff = Math.abs(col - bombCol);
                 
-                // If the tile is next to (or on top of) a bomb
+                //If tile is next to a bomb
                 if (rowDiff <= 1 && colDiff <= 1) {
                     return true;
                 }
@@ -160,19 +160,19 @@
         }
     
     
-        // FUNCTION: Places mines, excluding the first clicked tile
+        //Places mines, excluding the first clicked tile
         function initializeMines(excludeIndex = -1) { 
             mineIndices = [];
             const totalCells = gridSize * gridSize;
             const possibleMineIndices = new Set();
         
-            // *** TEMPORARY TEST CODE START: Force specific mine placement for testing safe click on tile 0 ***
+            /**** TEMPORARY TEST CODE START: Force specific mine placement for testing safe click on tile 0 ***
             if (excludeIndex === 0 && mineCount > 1) {
                 // Example fixed locations (right column)
                 mineIndices = [4, 9, 14, 19, 24].slice(0, mineCount); 
                 return; 
             }
-            // *** TEMPORARY TEST CODE END ***
+            // *** TEMPORARY TEST CODE END ***/
             
             // 1. Fill Set with all possible indices, excluding the first clicked tile
             for (let i = 0; i < totalCells; i++) {
