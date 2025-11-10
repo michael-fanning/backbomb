@@ -7,6 +7,9 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="styles.css">
 </head>
+
+<style> grid {grid-template-columns: repeat(6, 60px); } </style>
+    
 <body>
     <h1>Backbomb<h1>
     <p>Click tiles to reveal diamonds. Find a bomb and lose!</p>
@@ -27,7 +30,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <script>
-        const gridSize = 5;
+        const gridSize = 6;
         const mineCount = 3;
         let balance = 0;
         let mineIndices = [];
