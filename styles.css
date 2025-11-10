@@ -18,7 +18,6 @@ p {
 }
 .grid { 
     display: grid; 
-    grid-template-columns: repeat(5, 60px); /* 5 columns of 60px each */
     gap: 5px; 
     justify-content: center; 
     margin-top: 20px; 
