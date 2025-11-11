@@ -1,14 +1,16 @@
 html, body { 
-    overflow: hidden; 
+    /* Keep overflow: hidden to prevent page scroll from fixed width elements */
+    overflow-x: hidden; 
 }
 body { 
-    font-family: Arial, sans-serif; 
+    font-family: 'Inter', sans-serif;
     height: 100%;
     margin: 0;
     text-align: center; 
     position: relative; 
     min-height: 100vh;
     background-color: #E5EFFF; /*Light baby blue*/
+    padding-bottom: 50px; /* Ensure space for content below the end screen */
 }
 h1 { color: #010E26;} /*Dark blue*/
 p { 
@@ -21,9 +23,13 @@ p {
     gap: 5px; 
     justify-content: center; 
     margin-top: 20px; 
+    width: min(90vw, 500px); 
+    margin-left: auto;
+    margin-right: auto;
 }
 .cell { 
-    width: 60px; height: 60px; 
+    aspect-ratio: 1 / 1; 
+
     background: #ccc; 
     display: flex; align-items: center; 
     justify-content: center; 
@@ -93,10 +99,10 @@ p {
     padding: 20px 40px;
     font-size: 24px;
     cursor: pointer; 
-    background: #99BFFF;     
+    background: #99BFFF; 
     color: #010E26;
     border: 4px solid #548FF7;
-    border-radius: 8px;          
+    border-radius: 8px; 
     font-weight: bold; 
     transition: 0.3s ease;
     margin-bottom: 30px;
@@ -104,8 +110,8 @@ p {
 }
 
 #endResetButton:hover { 
-    background: #548FF7;     
-    color: white;             
+    background: #548FF7; 
+    color: white; 
 }
 
 /* Animation */
