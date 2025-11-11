@@ -1,1 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backbomb</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <style>
+        /* Global and Base Styles */
+        html, body { 
+            overflow-x: hidden;
+            height: 100%;
+        }
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0;
+            text-align: center; 
+            min-height: 100vh;
+            background-color: #E5EFFF; /*Light baby blue*/
+            color: #010E26;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
 
+        h1 { 
+            color: #010E26;
+            font-size: clamp(2.5rem, 5vw, 3rem); 
+            margin-bottom: 0.5rem;
+        } 
+        p { 
+            font-size: 16px; 
+            color: #010E26;
+            margin-bottom: 25px;
+        }
+
+        /* Utility Class */
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- Game Container Styling --- */
+        #gameContent.hidden {
+            display: none;
+        }
+
+        .grid { 
+            display: grid; 
+            gap: 5px; 
+            justify-content: center; 
+            margin: 20px auto; 
+            grid-template-columns: var(--grid-columns, repeat(7, 1fr)); 
+            width: min(90vw, 420px); 
+        }
+
+        .cell { 
+            aspect-ratio: 1 / 1; 
+            background: #ccc; 
+            display: flex; align-items: center; 
+            justify-content: center; 
+            font-size: clamp(16px, 4vw, 24px); 
+            cursor: pointer; 
+            border: 2px solid #444;
+            border-radius: 4px;
+            transition: transform 0.3s ease, background 0.3s ease; 
+            transform-style: preserve-3d;
+        }
+        .cell:hover { background: #bbb; }
+
+        /* Revealed states */
+        .cell.revealed { 
+            background: lightgreen; 
+            transform: rotateY(180deg); 
+            cursor: default; 
+        }
+        .cell.safe {
+            background: #fcea47; /* Pale Yellow */
+            transform: rotateY(180deg);
+            cursor: default;
+        }
+        .cell.mine { 
+            background: red; 
+            transform: rotateY(180deg); 
+        }
+
+        /* --- Main Menu Styling --- */
+        #mainMenu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .menu-description {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #444;
+        }
+
+        #difficultySelection {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .difficulty-btn {
+            padding: 15px 25px; /* Slightly larger buttons since they are the main action */
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #99BFFF; 
+            color: #010E26;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            transition: 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+            min-width: 120px;
+        }
+
+        .difficulty-btn:hover {
+            background: #548FF7;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Removed .selected class logic as selection is now instant start */
+
+        /* --- End Screen Styling --- */
+        .end-screen { 
+            position: fixed; top: 0; left: 0; 
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); 
+            color: white; display: flex;
+            flex-direction: column; align-items: center; 
+            justify-content: center;
+            z-index: 1000; 
+            transition: opacity 0.5s ease-in-out; 
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .end-screen.hidden { 
+            display: none; 
+            opacity: 0; 
+        }
+        .end-screen h2 { 
+            font-size: clamp(24px, 5vw, 32px);
+            font-weight: bold; 
+            text-transform: uppercase; 
+            animation: fadeIn 1s ease; 
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Buttons */
+        #resetContainer {
+            display: none;
+            margin-top: 20px;
+        }
+        #resetButton { 
+            padding: 12px 24px; 
+            font-size: 18px; 
+            cursor: pointer; 
+            background: #99BFFF; 
+            border: none; 
+            border-radius: 5px; 
+            font-weight: bold; 
+            transition: 0.3s ease;
+        }
+        #resetButton:hover { background: #548FF7; }
+
+        #endResetButton { 
+            padding: 20px 40px;
+            font-size: 24px;
+            cursor: pointer; 
+            background: #99BFFF; 
+            color: #010E26;
+            border: 4px solid #548FF7;
+            border-radius: 8px; 
+            font-weight: bold; 
+            transition: 0.3s ease;
+            margin-bottom: 30px;
+            z-index: 1001;
+        }
+
+        #endResetButton:hover { 
+            background: #548FF7; 
+            color: white; 
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+    
+<body>
+    
+    <!-- MAIN MENU SCREEN -->
+    <div id="mainMenu">
+        <h1>Backbomb</h1>
+        <p class="menu-description">Choose a difficulty below to start playing immediately!</p>
+        
+        <div id="difficultySelection">
+            <!-- Difficulty buttons populated by JavaScript -->
+        </div>
+
+        <!-- Start Game Button REMOVED as requested -->
+    </div>
+
+    <!-- GAME CONTENT (Hidden until start) -->
+    <div id="gameContent" class="hidden">
+        <h1 style="font-size: 2rem;">Backbomb</h1>
+        <p>Click tiles to reveal diamonds. Find a bomb and lose!</p>
+        <div class="grid" id="grid"></div>
+        <p id="status">Money: $0</p>
+
+        <div id="resetContainer" style="margin-top: 1.5rem; display: none;">
+            <button id="resetButton">Restart Board</button>
+        </div>
+    </div>
+
+    <!-- END SCREEN -->
+    <div id="endScreen" class="end-screen hidden">
+        <h2 id="endMessage"></h2>
+        <button id="endResetButton" class="hidden">Play Again</button>
+    </div>
+
+    <!-- CONFETTI CANVAS -->
+    <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1002;"></canvas>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        // Use 'let' for dynamic game settings
+        let gridSize = 7;
+        let mineCount = 5;
+        let selectedDifficulty = 'medium'; // Default selection
+
+        let balance = 0;
+        let mineIndices = [];
+        let revealedCells = 0;
+        let gameEnded = false;
+        let hitMine = false;
+        let firstClick = true; 
+    
+        const myCanvas = document.getElementById('confetti-canvas');
+        const myConfetti = confetti.create(myCanvas, {
+            resize: true,
+            useWorker: true
+        });
+
+        // DIFFICULTY SETTINGS
+        const difficulties = {
+            'easy': { size: 5, mines: 3, label: 'Easy (5x5, 3 Mines)' },
+            'medium': { size: 7, mines: 5, label: 'Medium (7x7, 5 Mines)' },
+            'hard': { size: 9, mines: 10, label: 'Hard (9x9, 10 Mines)' }
+        };
+
+        // --- MENU LOGIC ---
+
+        function renderDifficultyButtons() {
+            const container = document.getElementById('difficultySelection');
+            container.innerHTML = '';
+            
+            Object.keys(difficulties).forEach(key => {
+                const btn = document.createElement('button');
+                btn.classList.add('difficulty-btn');
+                btn.innerText = difficulties[key].label;
+                btn.dataset.difficulty = key;
+                
+                // NEW BEHAVIOR: Clicking starts the game immediately
+                btn.addEventListener('click', () => {
+                    selectDifficulty(key); // Set the parameters
+                    startGame();           // Launch the game
+                });
+                
+                container.appendChild(btn);
+            });
+        }
+
+        function selectDifficulty(key) {
+            // This function now only handles setting the game parameters
+            selectedDifficulty = key;
+            gridSize = difficulties[key].size;
+            mineCount = difficulties[key].mines;
+        }
+        
+        function startGame() {
+            // Set the game board CSS variable based on selected grid size
+            document.getElementById("grid").style.setProperty('--grid-columns', `repeat(${gridSize}, 1fr)`);
+            
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById('gameContent').classList.remove('hidden');
+            
+            // Re-initialize the game state based on the new difficulty
+            resetGame(false); 
+        }
+
+        // --- GAME LOGIC ---
+
+        // Checks if a tile is adjacent to a bomb.
+        function isAdjacent(index) {
+            for (const bombIndex of mineIndices) {
+                const row = Math.floor(index / gridSize);
+                const col = index % gridSize;
+                const bombRow = Math.floor(bombIndex / gridSize);
+                const bombCol = bombIndex % gridSize;
+    
+                const rowDiff = Math.abs(row - bombRow);
+                const colDiff = Math.abs(col - bombCol);
+                
+                // If tile is next to a bomb (within 1 unit in both directions)
+                if (rowDiff <= 1 && colDiff <= 1) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    
+        // Places mines, excluding the first clicked tile
+        function initializeMines(excludeIndex = -1) { 
+            mineIndices = [];
+            const totalCells = gridSize * gridSize;
+            const possibleMineIndices = new Set();
+            
+            // 1. Fill Set with all possible indices, excluding the first clicked tile
+            for (let i = 0; i < totalCells; i++) {
+                if (i !== excludeIndex) {
+                    possibleMineIndices.add(i);
+                }
+            }
+    
+            // 2. Select 'mineCount' random indices from the Set
+            const indicesArray = Array.from(possibleMineIndices);
+            for (let i = 0; i < mineCount; i++) {
+                if (indicesArray.length === 0) break;
+                
+                const randomIndex = Math.floor(Math.random() * indicesArray.length);
+                const selectedIndex = indicesArray.splice(randomIndex, 1)[0]; // Remove and get element
+                mineIndices.push(selectedIndex);
+            }
+        }
+    
+        function createGrid() {
+            const grid = document.getElementById("grid");
+            grid.innerHTML = "";
+            for (let i = 0; i < gridSize * gridSize; i++) {
+                const cell = document.createElement("div");
+                cell.classList.add("cell");
+                cell.dataset.index = i;
+                cell.addEventListener("click", () => revealCell(i));
+                grid.appendChild(cell);
+            }
+        }
+
+        /**
+         * Reveals all mines and adjacent safe tiles on the board.
+         * Used for both win and loss conditions.
+         */
+        function revealBoardOnEnd() {
+            document.querySelectorAll(".cell").forEach(c => {
+                const cIndex = parseInt(c.dataset.index);
+                const isTileAdjacent = isAdjacent(cIndex);
+
+                if (mineIndices.includes(cIndex)) {
+                    // Reveal mines
+                    c.classList.add("mine");
+                    c.innerHTML = "💣";
+                    c.style.transform = "rotateY(180deg)";
+                } else if (isTileAdjacent && !c.classList.contains("revealed")) {
+                    // Reveal adjacent safe tiles (yellow) if they haven't been revealed as a diamond
+                    c.classList.add("safe");
+                    c.innerHTML = "";
+                    c.style.transform = "rotateY(180deg)"; 
+                }
+            });
+        }
+    
+        function revealCell(index) {
+            if (gameEnded) return;
+    
+            // Delay mine placement until the first click is made
+            if (firstClick) {
+                initializeMines(index);
+                firstClick = false;
+            }
+    
+            const cell = document.querySelector(`.cell[data-index='${index}']`);
+            if (!cell || cell.classList.contains("revealed") || cell.classList.contains("safe")) return;
+    
+            cell.style.transform = "rotateY(180deg)"; //Flip animation
+    
+            const isMine = mineIndices.includes(index); // Check against the mine array
+    
+            if (isMine) {
+                // Case 1: Hit the Bomb 💣
+                
+                // Call function to reveal the board on loss
+                revealBoardOnEnd();
+    
+                if (balance > 5) {
+                    // Penalize the player for hitting a bomb if they have money
+                    balance = Math.floor(balance / 2);
+                } else {
+                    balance = 0;
+                }
+                
+                document.getElementById("status").innerText = `You clicked a bomb! Money: $${balance}`;
+                hitMine = true;
+                freezeBoard();
+                
+                checkEndGame(); 
+                
+                if (gameEnded === false) { 
+                    showResetButton(); // Show restart board option if player still has money
+                }
+            } else if (isAdjacent(index)) {
+                // Case 2: Hit a Safe/Adjacent Tile (Yellow, no diamond)
+                cell.classList.add("safe");
+                cell.innerHTML = "";
+                document.getElementById("status").innerText = `Money: $${balance}`;
+            } else {
+                // Case 3: Hit a Diamond Tile 💎 (Only if not adjacent to a mine)
+                cell.classList.add("revealed");
+                cell.innerHTML = "💎";
+                revealedCells++;
+                balance += 1;
+                document.getElementById("status").innerText = `Money: $${balance}`;
+                checkVictory();
+            }
+        }
+    
+        function freezeBoard() {
+            document.querySelectorAll(".cell").forEach(cell => cell.style.pointerEvents = "none");
+        }
+    
+        function checkVictory() {
+            let totalDiamondTiles = 0;
+            const totalCells = gridSize * gridSize;
+            
+            // Loop through all cells to find the count of true diamond tiles 
+            for (let i = 0; i < totalCells; i++) {
+                if (!mineIndices.includes(i) && !isAdjacent(i)) {
+                    totalDiamondTiles++;
+                }
+            }
+    
+            // Check if the number of revealed green diamond tiles matches the required count
+            if (revealedCells === totalDiamondTiles) {
+                document.getElementById("endMessage").innerText = `VICTORY! You found all the gems and won $${balance}!`;
+                document.getElementById("endScreen").classList.remove("hidden");
+                gameEnded = true;
+                showEndResetButton();
+                freezeBoard();
+                
+                // Call function to reveal the board on win
+                revealBoardOnEnd();
+    
+                myConfetti({
+                    particleCount: 150,
+                    spread: 120,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+    
+        function checkEndGame() {
+            if (balance <= 0 && hitMine) {
+                document.getElementById("endMessage").innerText = "Game Over! You lost ALL your money.";
+                document.getElementById("endScreen").classList.remove("hidden");
+                gameEnded = true;
+                showEndResetButton();
+                freezeBoard();
+            }
+        }
+    
+        function showResetButton() {
+            // Shows the "Restart Board" button if a mine was hit but the player still has money
+            if (hitMine && gameEnded == false) {
+                document.getElementById("resetContainer").style.display = "block";
+            }
+        }
+    
+        function showEndResetButton() {
+            // Shows the "Play Again" button if the game is fully over (Win or zero cash loss)
+            if (gameEnded) {
+                document.getElementById("endResetButton").classList.remove("hidden");
+                document.getElementById("resetContainer").style.display = "none";
+            }
+        }
+    
+        function resetGame(returnToMenu = true) {
+            // Reset core game state
+            revealedCells = 0;
+            if (returnToMenu) {
+                balance = 0; // Only reset balance if returning to the main menu
+            }
+            gameEnded = false;
+            hitMine = false; 
+            firstClick = true; 
+            mineIndices = []; 
+            
+            // Reset UI elements
+            document.getElementById("status").innerText = `Money: $${balance}`;
+            document.getElementById("endScreen").classList.add("hidden");
+            document.getElementById("resetContainer").style.display = "none";
+            document.getElementById("endResetButton").classList.add("hidden"); 
+            document.querySelectorAll(".cell").forEach(cell => cell.style.pointerEvents = "auto");
+            if (typeof myConfetti === 'function') { myConfetti.reset(); }
+
+            // Go back to menu or restart game
+            if (returnToMenu) {
+                document.getElementById('gameContent').classList.add('hidden');
+                document.getElementById('mainMenu').classList.remove('hidden');
+            } else {
+                createGrid();
+            }
+        }
+    
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Event Listeners
+            document.getElementById("resetButton").addEventListener("click", () => resetGame(false)); 
+            document.getElementById("endResetButton").addEventListener("click", () => resetGame(true)); 
+
+            // Initial Menu Setup
+            renderDifficultyButtons();
+        });
+    </script>
+</body>
+</html>
