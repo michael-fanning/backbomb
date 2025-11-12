@@ -211,7 +211,7 @@
     <!-- MAIN MENU SCREEN -->
     <div id="mainMenu">
         <h1>Backbomb</h1>
-        <p class="menu-description">Choose a difficulty below to start playing immediately!</p>
+        <p class="menu-description">Click tiles to reveal diamonds. Find a bomb and lose!</p>
         
         <div id="difficultySelection"> </div>
 
@@ -225,7 +225,7 @@
         <p id="status">Money: $0</p>
 
         <div id="resetContainer" style="margin-top: 1.5rem; display: none;">
-            <button id="resetButton">Restart Board</button>
+            <button id="resetButton">Restart Game</button>
         </div>
     </div>
 
@@ -262,8 +262,8 @@
         // DIFFICULTY SETTINGS
         const difficulties = {
             'easy': { size: 5, mines: 2, label: 'Easy' },
-            'medium': { size: 6, mines: 5, label: 'Medium' },
-            'hard': { size: 7, mines: 7, label: 'Hard' }
+            'medium': { size: 7, mines: 5, label: 'Medium' },
+            'hard': { size: 8, mines: 7, label: 'Hard' }
         };
 
         // --- MENU LOGIC ---
@@ -278,7 +278,6 @@
                 btn.innerText = difficulties[key].label;
                 btn.dataset.difficulty = key;
                 
-                // NEW BEHAVIOR: Clicking starts the game immediately
                 btn.addEventListener('click', () => {
                     selectDifficulty(key);
                     startGame();
@@ -302,8 +301,6 @@
             
             resetGame(false); 
         }
-
-        // --- GAME LOGIC ---
 
         // Checks if a tile is adjacent to a bomb.
         function isAdjacent(index) {
@@ -360,10 +357,6 @@
             }
         }
 
-        /**
-         * Reveals all mines and adjacent safe tiles on the board.
-         * Used for both win and loss conditions.
-         */
         function revealBoardOnEnd() {
             document.querySelectorAll(".cell").forEach(c => {
                 const cIndex = parseInt(c.dataset.index);
