@@ -7,7 +7,6 @@
     <link rel="icon" type="image/png" href="favicon.png">
     
     <style>
-        /* Global and Base Styles */
         html, body { 
             overflow-x: hidden;
             height: 100%;
@@ -138,8 +137,6 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        /* Removed .selected class logic as selection is now instant start */
-
         /* --- End Screen Styling --- */
         .end-screen { 
             position: fixed; top: 0; left: 0; 
@@ -217,11 +214,8 @@
         <h1>Backbomb</h1>
         <p class="menu-description">Choose a difficulty below to start playing immediately!</p>
         
-        <div id="difficultySelection">
-            <!-- Difficulty buttons populated by JavaScript -->
-        </div>
+        <div id="difficultySelection"> </div>
 
-        <!-- Start Game Button REMOVED as requested -->
     </div>
 
     <!-- GAME CONTENT (Hidden until start) -->
@@ -268,9 +262,9 @@
 
         // DIFFICULTY SETTINGS
         const difficulties = {
-            'easy': { size: 5, mines: 3, label: 'Easy (5x5, 3 Mines)' },
-            'medium': { size: 7, mines: 5, label: 'Medium (7x7, 5 Mines)' },
-            'hard': { size: 9, mines: 10, label: 'Hard (9x9, 10 Mines)' }
+            'easy': { size: 5, mines: 3, label: 'Easy' },
+            'medium': { size: 6, mines: 5, label: 'Medium' },
+            'hard': { size: 8, mines: 6, label: 'Hard' }
         };
 
         // --- MENU LOGIC ---
@@ -287,8 +281,8 @@
                 
                 // NEW BEHAVIOR: Clicking starts the game immediately
                 btn.addEventListener('click', () => {
-                    selectDifficulty(key); // Set the parameters
-                    startGame();           // Launch the game
+                    selectDifficulty(key);
+                    startGame();
                 });
                 
                 container.appendChild(btn);
@@ -296,20 +290,17 @@
         }
 
         function selectDifficulty(key) {
-            // This function now only handles setting the game parameters
             selectedDifficulty = key;
             gridSize = difficulties[key].size;
             mineCount = difficulties[key].mines;
         }
         
         function startGame() {
-            // Set the game board CSS variable based on selected grid size
             document.getElementById("grid").style.setProperty('--grid-columns', `repeat(${gridSize}, 1fr)`);
             
             document.getElementById('mainMenu').classList.add('hidden');
             document.getElementById('gameContent').classList.remove('hidden');
             
-            // Re-initialize the game state based on the new difficulty
             resetGame(false); 
         }
 
