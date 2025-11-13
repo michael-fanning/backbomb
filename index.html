@@ -401,10 +401,6 @@
             }
         }
 
-        /**
-         * Reveals all mines and adjacent safe tiles on the board.
-         * Used for both win and loss conditions.
-         */
         function revealBoardOnEnd() {
             document.querySelectorAll(".cell").forEach(c => {
                 const cIndex = parseInt(c.dataset.index);
@@ -446,8 +442,7 @@
                 // Call function to reveal the board on loss
                 revealBoardOnEnd();
     
-                if (balance > 5) {
-                    // Penalize the player for hitting a bomb if they have money
+                if (balance > 1) {
                     balance = Math.floor(balance / 2);
                 } else {
                     balance = 0;
