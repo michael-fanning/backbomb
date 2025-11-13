@@ -220,7 +220,7 @@
     <!-- GAME CONTENT (Hidden until start) -->
     <div id="gameContent" class="hidden">
         <h1 style="font-size: 2rem;">Backbomb</h1>
-        <p>Click tiles to reveal diamonds. Find a bomb and lose!</p>
+        <p id="gameDescription">Click tiles to reveal diamonds. Find a bomb and lose!</p>
         <div class="grid" id="grid"></div>
         <p id="status">Money: $0</p>
 
@@ -298,7 +298,13 @@
             
             document.getElementById('mainMenu').classList.add('hidden');
             document.getElementById('gameContent').classList.remove('hidden');
+
+            // Get the label for the currently selected difficulty
+            const difficultyLabel = difficulties[selectedDifficulty].label;
             
+            // Update the description paragraph with the difficulty label
+            document.getElementById('gameDescription').innerText = `Difficulty: ${difficultyLabel}. Click tiles to reveal diamonds. Find a bomb and lose!`;
+                
             resetGame(false); 
         }
 
