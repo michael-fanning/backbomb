@@ -231,7 +231,7 @@
 
     <!-- END SCREEN -->
     <div id="endScreen" class="end-screen hidden">
-        <h2 id="endMessage"></h2>
+        <h3 id="endMessage"></h3>
         <button id="endResetButton" class="hidden">Play Again</button>
     </div>
 
@@ -244,7 +244,7 @@
         // Use 'let' for dynamic game settings
         let gridSize = 7;
         let mineCount = 5;
-        let selectedDifficulty = 'medium'; // Default selection
+        let selectedDifficulty = 'medium';
 
         let balance = 0;
         let mineIndices = [];
@@ -303,7 +303,7 @@
             const difficultyLabel = difficulties[selectedDifficulty].label;
             
             // Update the description paragraph with the difficulty label
-            document.getElementById('gameDescription').innerText = `Difficulty: ${difficultyLabel}. Click tiles to reveal diamonds. Find a bomb and lose!`;
+            document.getElementById('gameDescription').innerText = `Difficulty: ${difficultyLabel}`;
                 
             resetGame(false); 
         }
