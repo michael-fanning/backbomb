@@ -42,48 +42,75 @@
             display: none !important;
         }
 
+        /* --- New Back Button Styling --- */
+        #backToMenu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(1, 14, 38, 0.7); /* Dark semi-transparent */
+            color: white;
+            font-size: 30px;
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            transition: background 0.2s ease;
+            z-index: 1003; /* Higher than confetti */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #backToMenu:hover {
+            background: #010E26; /* Darker on hover */
+        }
+
         /* --- Game Container Styling --- */
         #gameContent.hidden {
             display: none;
         }
 
-        .grid { 
-            display: grid; 
-            gap: 5px; 
-            justify-content: center; 
-            margin: 20px auto; 
-            grid-template-columns: var(--grid-columns, repeat(7, 1fr)); 
-            width: min(90vw, 420px); 
+        .grid {  
+            display: grid;  
+            gap: 5px;  
+            justify-content: center;  
+            margin: 20px auto;  
+            grid-template-columns: var(--grid-columns, repeat(7, 1fr));  
+            width: min(90vw, 420px);  
         }
 
-        .cell { 
-            aspect-ratio: 1 / 1; 
-            background: #ccc; 
-            display: flex; align-items: center; 
-            justify-content: center; 
-            font-size: clamp(16px, 4vw, 24px); 
-            cursor: pointer; 
+        .cell {  
+            aspect-ratio: 1 / 1;  
+            background: #ccc;  
+            display: flex; align-items: center;  
+            justify-content: center;  
+            font-size: clamp(16px, 4vw, 24px);  
+            cursor: pointer;  
             border: 2px solid #444;
             border-radius: 4px;
-            transition: transform 0.3s ease, background 0.3s ease; 
+            transition: transform 0.3s ease, background 0.3s ease;  
             transform-style: preserve-3d;
         }
         .cell:hover { background: #bbb; }
 
         /* Revealed states */
-        .cell.revealed { 
-            background: lightgreen; 
-            transform: rotateY(180deg); 
-            cursor: default; 
+        .cell.revealed {  
+            background: lightgreen;  
+            transform: rotateY(180deg);  
+            cursor: default;  
         }
         .cell.safe {
             background: #fcea47; /* Pale Yellow */
             transform: rotateY(180deg);
             cursor: default;
         }
-        .cell.mine { 
-            background: red; 
-            transform: rotateY(180deg); 
+        .cell.mine {  
+            background: red;  
+            transform: rotateY(180deg);  
         }
 
         /* --- Main Menu Styling --- */
@@ -120,7 +147,7 @@
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            background: #99BFFF; 
+            background: #99BFFF;  
             color: #010E26;
             border: 2px solid transparent;
             border-radius: 8px;
@@ -138,27 +165,27 @@
         }
 
         /* --- End Screen Styling --- */
-        .end-screen { 
-            position: fixed; top: 0; left: 0; 
+        .end-screen {  
+            position: fixed; top: 0; left: 0;  
             width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9); 
+            background: rgba(0, 0, 0, 0.9);  
             color: white; display: flex;
-            flex-direction: column; align-items: center; 
+            flex-direction: column; align-items: center;  
             justify-content: center;
-            z-index: 1000; 
-            transition: opacity 0.5s ease-in-out; 
+            z-index: 1000;  
+            transition: opacity 0.5s ease-in-out;  
             padding: 20px;
             box-sizing: border-box;
         }
-        .end-screen.hidden { 
-            display: none; 
-            opacity: 0; 
+        .end-screen.hidden {  
+            display: none;  
+            opacity: 0;  
         }
-        .end-screen h2 { 
+        .end-screen h2 {  
             font-size: clamp(24px, 5vw, 32px);
-            font-weight: bold; 
-            text-transform: uppercase; 
-            animation: fadeIn 1s ease; 
+            font-weight: bold;  
+            text-transform: uppercase;  
+            animation: fadeIn 1s ease;  
             margin-bottom: 20px;
             text-align: center;
         }
@@ -168,35 +195,35 @@
             display: none;
             margin-top: 20px;
         }
-        #resetButton { 
-            padding: 12px 24px; 
-            font-size: 18px; 
-            cursor: pointer; 
-            background: #99BFFF; 
-            border: none; 
-            border-radius: 5px; 
-            font-weight: bold; 
+        #resetButton {  
+            padding: 12px 24px;  
+            font-size: 18px;  
+            cursor: pointer;  
+            background: #99BFFF;  
+            border: none;  
+            border-radius: 5px;  
+            font-weight: bold;  
             transition: 0.3s ease;
         }
         #resetButton:hover { background: #548FF7; }
 
-        #endResetButton { 
+        #endResetButton {  
             padding: 20px 40px;
             font-size: 24px;
-            cursor: pointer; 
-            background: #99BFFF; 
+            cursor: pointer;  
+            background: #99BFFF;  
             color: #010E26;
             border: 4px solid #548FF7;
-            border-radius: 8px; 
-            font-weight: bold; 
+            border-radius: 8px;  
+            font-weight: bold;  
             transition: 0.3s ease;
             margin-bottom: 30px;
             z-index: 1001;
         }
 
-        #endResetButton:hover { 
-            background: #548FF7; 
-            color: white; 
+        #endResetButton:hover {  
+            background: #548FF7;  
+            color: white;  
         }
 
         /* Animation */
@@ -208,6 +235,11 @@
 </head>
     
 <body>
+    <!-- Back Button (Only visible during gameplay) -->
+    <button id="backToMenu" class="hidden" aria-label="Back to Main Menu">
+        &times;
+    </button>
+    
     <!-- MAIN MENU SCREEN -->
     <div id="mainMenu">
         <h1>Backbomb</h1>
@@ -220,18 +252,20 @@
     <!-- GAME CONTENT (Hidden until start) -->
     <div id="gameContent" class="hidden">
         <h1 style="font-size: 2rem;">Backbomb</h1>
-        <h2 id="gameDescription"></h2>
+        <!-- Using a paragraph tag for the description for consistent styling -->
+        <p id="gameDescription">Click tiles to reveal diamonds. Find a bomb and lose!</p>
         <div class="grid" id="grid"></div>
         <p id="status">Money: $0</p>
 
         <div id="resetContainer" style="margin-top: 1.5rem; display: none;">
-            <button id="resetButton">Restart Game</button>
+            <button id="resetButton">Restart Board</button>
         </div>
     </div>
 
     <!-- END SCREEN -->
     <div id="endScreen" class="end-screen hidden">
-        <h3 id="endMessage"></h3>
+        <!-- Reverting to H2 tag for consistency with the CSS rules -->
+        <h2 id="endMessage"></h2> 
         <button id="endResetButton" class="hidden">Play Again</button>
     </div>
 
@@ -298,15 +332,19 @@
             
             document.getElementById('mainMenu').classList.add('hidden');
             document.getElementById('gameContent').classList.remove('hidden');
-
+            document.getElementById('backToMenu').classList.remove('hidden'); // Show back button
+            
             // Get the label for the currently selected difficulty
             const difficultyLabel = difficulties[selectedDifficulty].label;
             
             // Update the description paragraph with the difficulty label
-            document.getElementById('gameDescription').innerText = `Difficulty: ${difficultyLabel}`;
-                
+            document.getElementById('gameDescription').innerText = 
+                `Difficulty: ${difficultyLabel}. Click tiles to reveal diamonds. Find a bomb and lose!`;
+
             resetGame(false); 
         }
+
+        // --- GAME LOGIC ---
 
         // Checks if a tile is adjacent to a bomb.
         function isAdjacent(index) {
@@ -363,6 +401,10 @@
             }
         }
 
+        /**
+         * Reveals all mines and adjacent safe tiles on the board.
+         * Used for both win and loss conditions.
+         */
         function revealBoardOnEnd() {
             document.querySelectorAll(".cell").forEach(c => {
                 const cIndex = parseInt(c.dataset.index);
@@ -518,6 +560,7 @@
             if (returnToMenu) {
                 document.getElementById('gameContent').classList.add('hidden');
                 document.getElementById('mainMenu').classList.remove('hidden');
+                document.getElementById('backToMenu').classList.add('hidden'); // Hide back button
             } else {
                 createGrid();
             }
@@ -527,6 +570,9 @@
             // Event Listeners
             document.getElementById("resetButton").addEventListener("click", () => resetGame(false)); 
             document.getElementById("endResetButton").addEventListener("click", () => resetGame(true)); 
+            
+            // New listener for the top-left X button
+            document.getElementById("backToMenu").addEventListener("click", () => resetGame(true)); 
 
             // Initial Menu Setup
             renderDifficultyButtons();
