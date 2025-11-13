@@ -253,7 +253,7 @@
     <div id="gameContent" class="hidden">
         <h1 style="font-size: 2rem;">Backbomb</h1>
         <!-- Using a paragraph tag for the description for consistent styling -->
-        <p id="gameDescription">Click tiles to reveal diamonds. Find a bomb and lose!</p>
+        <h3 id="gameDescription"></h3>
         <div class="grid" id="grid"></div>
         <p id="status">Money: $0</p>
 
@@ -338,8 +338,7 @@
             const difficultyLabel = difficulties[selectedDifficulty].label;
             
             // Update the description paragraph with the difficulty label
-            document.getElementById('gameDescription').innerText = 
-                `Difficulty: ${difficultyLabel}. Click tiles to reveal diamonds. Find a bomb and lose!`;
+            document.getElementById('gameDescription').innerText = `Difficulty: ${difficultyLabel}.`;
 
             resetGame(false); 
         }
