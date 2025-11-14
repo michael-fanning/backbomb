@@ -12,7 +12,7 @@
             height: 100%;
         }
         body { 
-            font-family: Arial, sans-serif; 
+            font-family: 'Inter', sans-serif; 
             margin: 0;
             text-align: center; 
             min-height: 100vh;
@@ -142,7 +142,7 @@
             justify-content: center;
         }
 
-        .difficulty-btn {
+        .difficulty-btn, #howToPlayBtn {
             padding: 15px 25px; /* Slightly larger buttons since they are the main action */
             font-size: 18px;
             font-weight: bold;
@@ -155,9 +155,10 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             flex-grow: 1;
             min-width: 120px;
+            margin-top: 10px; /* Separator for How To Play button */
         }
 
-        .difficulty-btn:hover {
+        .difficulty-btn:hover, #howToPlayBtn:hover {
             background: #548FF7;
             color: white;
             transform: translateY(-2px);
@@ -226,6 +227,115 @@
             color: white;  
         }
 
+        /* --- Tutorial Modal/Carousel Styling --- */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            position: relative;
+            text-align: center;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #444;
+            border: none;
+            background: none;
+        }
+        .close-btn:hover { color: #010E26; }
+
+        .carousel-container {
+            position: relative;
+            margin-top: 20px;
+        }
+
+        .carousel-slide {
+            transition: opacity 0.5s ease;
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+            position: relative; /* Bring active slide back to flow */
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            max-width: 250px;
+            height: auto;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .carousel-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .carousel-btn {
+            background: #548FF7;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .carousel-btn:disabled {
+            background: #ccc;
+            cursor: default;
+        }
+        .carousel-btn:hover:not(:disabled) {
+            background: #041f7a;
+        }
+        .dots {
+            margin: 0 10px;
+            display: flex;
+            align-items: center;
+        }
+        .dot {
+            height: 10px;
+            width: 10px;
+            margin: 0 4px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+        .dot.active {
+            background-color: #548FF7;
+        }
+
+
         /* Animation */
         @keyframes fadeIn {
             0% { opacity: 0; transform: translateY(30px); }
@@ -246,13 +356,15 @@
         <p class="menu-description">Click tiles to search for diamonds. Find a mine and lose!</p>
         
         <div id="difficultySelection"> </div>
+        
+        <!-- NEW HOW TO PLAY BUTTON -->
+        <button id="howToPlayBtn" class="difficulty-btn">How to Play</button>
 
     </div>
 
     <!-- GAME CONTENT (Hidden until start) -->
     <div id="gameContent" class="hidden">
         <h1 style="font-size: 2rem;">Backbomb</h1>
-        <!-- Using a paragraph tag for the description for consistent styling -->
         <h3 id="gameDescription"></h3>
         <div class="grid" id="grid"></div>
         <p id="status">Money: $0</p>
@@ -264,11 +376,43 @@
 
     <!-- END SCREEN -->
     <div id="endScreen" class="end-screen hidden">
-        <!-- Reverting to H2 tag for consistency with the CSS rules -->
         <h2 id="endMessage"></h2> 
         <button id="endResetButton" class="hidden">Play Again</button>
     </div>
 
+    <!-- TUTORIAL MODAL (Hidden by default) -->
+    <div id="tutorialModal" class="modal hidden">
+        <div class="modal-content">
+            <button class="close-btn" id="closeTutorialBtn">&times;</button>
+            <h2>How to Play Backbomb</h2>
+
+            <div class="carousel-container">
+                <div class="carousel-slide active" data-slide="0">
+                    <img src="https://placehold.co/400x400/99BFFF/010E26?text=tutorial1.png" alt="Tutorial Image 1">
+                    <p><strong>Step 1: Find the Diamonds (💎).</strong> Click a tile that is not adjacent to a mine to find a diamond and increase your money by $1.</p>
+                </div>
+                <div class="carousel-slide" data-slide="1">
+                    <img src="https://placehold.co/400x400/548FF7/FFFFFF?text=tutorial2.png" alt="Tutorial Image 2">
+                    <p><strong>Step 2: Avoid Adjacent Tiles (🟡).</strong> Tiles colored yellow after a click are adjacent to a bomb. They are safe but contain no diamond. Treat them as warnings!</p>
+                </div>
+                <div class="carousel-slide" data-slide="2">
+                    <img src="https://placehold.co/400x400/041f7a/FFFFFF?text=tutorial3.png" alt="Tutorial Image 3">
+                    <p><strong>Step 3: Dodge the Bomb (💣).</strong> If you click a bomb, you lose half your current money and the board resets. Lose all your money and it's Game Over!</p>
+                </div>
+            </div>
+
+            <div class="carousel-nav">
+                <button class="carousel-btn" id="prevBtn" disabled>Previous</button>
+                <div class="dots" id="carouselDots">
+                    <span class="dot active" data-dot="0"></span>
+                    <span class="dot" data-dot="1"></span>
+                    <span class="dot" data-dot="2"></span>
+                </div>
+                <button class="carousel-btn" id="nextBtn">Next</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- CONFETTI CANVAS -->
     <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1002;"></canvas>
     
@@ -286,7 +430,11 @@
         let gameEnded = false;
         let hitMine = false;
         let firstClick = true; 
-    
+        
+        // Carousel State
+        let currentSlide = 0;
+        const totalSlides = 3;
+
         const myCanvas = document.getElementById('confetti-canvas');
         const myConfetti = confetti.create(myCanvas, {
             resize: true,
@@ -299,6 +447,43 @@
             'medium': { size: 7, mines: 5, label: 'Medium' },
             'hard': { size: 8, mines: 7, label: 'Hard' }
         };
+
+        // --- CAROUSEL LOGIC ---
+
+        function updateCarousel(direction) {
+            currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+            showSlide(currentSlide);
+        }
+
+        function showSlide(index) {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const dots = document.querySelectorAll('.dot');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === totalSlides - 1;
+            
+            currentSlide = index;
+        }
+
+        function openTutorial() {
+            document.getElementById('tutorialModal').classList.remove('hidden');
+            currentSlide = 0;
+            showSlide(currentSlide);
+        }
+
+        function closeTutorial() {
+            document.getElementById('tutorialModal').classList.add('hidden');
+        }
 
         // --- MENU LOGIC ---
 
@@ -338,7 +523,7 @@
             const difficultyLabel = difficulties[selectedDifficulty].label;
             
             // Update the description paragraph with the difficulty label
-            document.getElementById('gameDescription').innerText = `Difficulty: ${difficultyLabel}`;
+            document.getElementById('gameDescription').innerText = `Difficulty: ${difficultyLabel} | Mines: ${mineCount}`;
 
             resetGame(false); 
         }
@@ -352,7 +537,7 @@
                 const col = index % gridSize;
                 const bombRow = Math.floor(bombIndex / gridSize);
                 const bombCol = bombIndex % gridSize;
-    
+                
                 const rowDiff = Math.abs(row - bombRow);
                 const colDiff = Math.abs(col - bombCol);
                 
@@ -363,7 +548,7 @@
             }
             return false;
         }
-    
+        
         // Places mines, excluding the first clicked tile
         function initializeMines(excludeIndex = -1) { 
             mineIndices = [];
@@ -376,7 +561,7 @@
                     possibleMineIndices.add(i);
                 }
             }
-    
+        
             // 2. Select 'mineCount' random indices from the Set
             const indicesArray = Array.from(possibleMineIndices);
             for (let i = 0; i < mineCount; i++) {
@@ -387,7 +572,7 @@
                 mineIndices.push(selectedIndex);
             }
         }
-    
+        
         function createGrid() {
             const grid = document.getElementById("grid");
             grid.innerHTML = "";
@@ -418,29 +603,29 @@
                 }
             });
         }
-    
+        
         function revealCell(index) {
             if (gameEnded) return;
-    
+        
             // Delay mine placement until the first click is made
             if (firstClick) {
                 initializeMines(index);
                 firstClick = false;
             }
-    
+        
             const cell = document.querySelector(`.cell[data-index='${index}']`);
             if (!cell || cell.classList.contains("revealed") || cell.classList.contains("safe")) return;
-    
+        
             cell.style.transform = "rotateY(180deg)"; //Flip animation
-    
+        
             const isMine = mineIndices.includes(index); // Check against the mine array
-    
+        
             if (isMine) {
                 // Case 1: Hit the Bomb 💣
                 
                 // Call function to reveal the board on loss
                 revealBoardOnEnd();
-    
+        
                 if (balance >= 2) {
                     balance = Math.floor(balance / 2);
                 } else {
@@ -471,11 +656,11 @@
                 checkVictory();
             }
         }
-    
+        
         function freezeBoard() {
             document.querySelectorAll(".cell").forEach(cell => cell.style.pointerEvents = "none");
         }
-    
+        
         function checkVictory() {
             let totalDiamondTiles = 0;
             const totalCells = gridSize * gridSize;
@@ -486,7 +671,7 @@
                     totalDiamondTiles++;
                 }
             }
-    
+        
             // Check if the number of revealed green diamond tiles matches the required count
             if (revealedCells === totalDiamondTiles) {
                 document.getElementById("endMessage").innerText = `VICTORY! You found all the gems and won $${balance}!`;
@@ -497,7 +682,7 @@
                 
                 // Call function to reveal the board on win
                 revealBoardOnEnd();
-    
+        
                 myConfetti({
                     particleCount: 150,
                     spread: 120,
@@ -505,7 +690,7 @@
                 });
             }
         }
-    
+        
         function checkEndGame() {
             if (balance <= 0 && hitMine) {
                 document.getElementById("endMessage").innerText = "Game Over! You lost ALL your money.";
@@ -515,14 +700,14 @@
                 freezeBoard();
             }
         }
-    
+        
         function showResetButton() {
             // Shows the "Restart Board" button if a mine was hit but the player still has money
             if (hitMine && gameEnded == false) {
                 document.getElementById("resetContainer").style.display = "block";
             }
         }
-    
+        
         function showEndResetButton() {
             // Shows the "Play Again" button if the game is fully over (Win or zero cash loss)
             if (gameEnded) {
@@ -530,7 +715,7 @@
                 document.getElementById("resetContainer").style.display = "none";
             }
         }
-    
+        
         function resetGame(returnToMenu = true) {
             // Reset core game state
             revealedCells = 0;
@@ -559,22 +744,27 @@
                 createGrid();
             }
         }
-    
+        
         document.addEventListener('DOMContentLoaded', (event) => {
-            // Event Listeners
+            // Event Listeners for Game
             document.getElementById("resetButton").addEventListener("click", () => {
                 resetGame(false);
                 startGame();
             });
             document.getElementById("endResetButton").addEventListener("click", () => {
                 resetGame(true); 
-                startGame();
             });
-            // New listener for the top-left X button
             document.getElementById("backToMenu").addEventListener("click", () => resetGame(true)); 
 
+            // Event Listeners for Tutorial Modal (NEW)
+            document.getElementById("howToPlayBtn").addEventListener("click", openTutorial);
+            document.getElementById("closeTutorialBtn").addEventListener("click", closeTutorial);
+            document.getElementById("prevBtn").addEventListener("click", () => updateCarousel(-1));
+            document.getElementById("nextBtn").addEventListener("click", () => updateCarousel(1));
+            
             // Initial Menu Setup
             renderDifficultyButtons();
+            showSlide(currentSlide); // Initialize carousel display
         });
     </script>
 </body>
