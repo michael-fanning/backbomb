@@ -81,44 +81,52 @@
         #gameContent.hidden {
             display: none;
         }
-
-        .grid {  
-            display: grid;  
-            gap: 5px;  
-            justify-content: center;  
-            margin: 20px auto;  
-            grid-template-columns: var(--grid-columns, repeat(7, 1fr));  
-            width: min(90vw, 420px);  
+        
+        /* Ensure H3 is styled nicely inside the game content */
+        #gameContent h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: #041f7a;
+            font-weight: 600;
         }
 
-        .cell {  
-            aspect-ratio: 1 / 1;  
-            background: #ccc;  
-            display: flex; align-items: center;  
-            justify-content: center;  
-            font-size: clamp(16px, 4vw, 24px);  
-            cursor: pointer;  
+        .grid { 
+            display: grid; 
+            gap: 5px; 
+            justify-content: center; 
+            margin: 20px auto; 
+            grid-template-columns: var(--grid-columns, repeat(7, 1fr)); 
+            width: min(90vw, 420px); 
+        }
+
+        .cell { 
+            aspect-ratio: 1 / 1; 
+            background: #ccc; 
+            display: flex; align-items: center; 
+            justify-content: center; 
+            font-size: clamp(16px, 4vw, 24px); 
+            cursor: pointer; 
             border: 2px solid #444;
             border-radius: 4px;
-            transition: transform 0.3s ease, background 0.3s ease;  
+            transition: transform 0.3s ease, background 0.3s ease; 
             transform-style: preserve-3d;
         }
         .cell:hover:not(.revealed):not(.safe) { background: #bbb; } /* Only hover if not revealed */
 
         /* Revealed states */
-        .cell.revealed {  
-            background: lightgreen;  
-            transform: rotateY(180deg);  
-            cursor: default;  
+        .cell.revealed { 
+            background: lightgreen; 
+            transform: rotateY(180deg); 
+            cursor: default; 
         }
         .cell.safe {
             background: #fcea47; /* Pale Yellow */
             transform: rotateY(180deg);
             cursor: default;
         }
-        .cell.mine {  
-            background: red;  
-            transform: rotateY(180deg);  
+        .cell.mine { 
+            background: red; 
+            transform: rotateY(180deg); 
         }
 
         /* --- Main Menu Styling --- */
@@ -155,7 +163,7 @@
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            background: #99BFFF;  
+            background: #99BFFF; 
             color: #010E26;
             border: 2px solid transparent;
             border-radius: 8px;
@@ -174,27 +182,27 @@
         }
 
         /* --- End Screen Styling --- */
-        .end-screen {  
-            position: fixed; top: 0; left: 0;  
+        .end-screen { 
+            position: fixed; top: 0; left: 0; 
             width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);  
+            background: rgba(0, 0, 0, 0.6); /* FIX: Reduced opacity from 0.9 to 0.6 */ 
             color: white; display: flex;
-            flex-direction: column; align-items: center;  
+            flex-direction: column; align-items: center; 
             justify-content: center;
-            z-index: 1000;  
-            transition: opacity 0.5s ease-in-out;  
+            z-index: 1000; 
+            transition: opacity 0.5s ease-in-out; 
             padding: 20px;
             box-sizing: border-box;
         }
-        .end-screen.hidden {  
-            display: none;  
-            opacity: 0;  
+        .end-screen.hidden { 
+            display: none; 
+            opacity: 0; 
         }
-        .end-screen h2 {  
+        .end-screen h2 { 
             font-size: clamp(24px, 5vw, 32px);
-            font-weight: bold;  
-            text-transform: uppercase;  
-            animation: fadeIn 1s ease;  
+            font-weight: bold; 
+            text-transform: uppercase; 
+            animation: fadeIn 1s ease; 
             margin-bottom: 20px;
             text-align: center;
         }
@@ -204,35 +212,35 @@
             display: none;
             margin-top: 20px;
         }
-        #resetButton {  
-            padding: 12px 24px;  
-            font-size: 18px;  
-            cursor: pointer;  
-            background: #99BFFF;  
-            border: none;  
-            border-radius: 5px;  
-            font-weight: bold;  
+        #resetButton { 
+            padding: 12px 24px; 
+            font-size: 18px; 
+            cursor: pointer; 
+            background: #99BFFF; 
+            border: none; 
+            border-radius: 5px; 
+            font-weight: bold; 
             transition: 0.3s ease;
         }
         #resetButton:hover { background: #548FF7; }
 
-        #endResetButton {  
+        #endResetButton { 
             padding: 20px 40px;
             font-size: 24px;
-            cursor: pointer;  
-            background: #99BFFF;  
+            cursor: pointer; 
+            background: #99BFFF; 
             color: #010E26;
             border: 4px solid #548FF7;
-            border-radius: 8px;  
-            font-weight: bold;  
+            border-radius: 8px; 
+            font-weight: bold; 
             transition: 0.3s ease;
             margin-bottom: 30px;
             z-index: 1001;
         }
 
-        #endResetButton:hover {  
-            background: #548FF7;  
-            color: white;  
+        #endResetButton:hover { 
+            background: #548FF7; 
+            color: white; 
         }
 
         /* --- Tutorial Modal/Carousel Styling --- */
@@ -242,7 +250,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.6); /* FIX: Reduced opacity from 0.8 to 0.6 */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -372,7 +380,7 @@
 
     <!-- GAME CONTENT (Hidden until start) -->
     <div id="gameContent" class="hidden">
-        <h1 style="font-size: 2rem;">Backbomb</h1>
+        <!-- REMOVED: The redundant H1 title that looked like a second menu -->
         <h3 id="gameDescription"></h3>
         <div class="grid" id="grid"></div>
         <p id="status">Money: $0</p>
