@@ -27,8 +27,8 @@
         }
 
         h1 { 
-            color: #010E26;
-            font-size: clamp(2.5rem, 5vw, 3rem); 
+            font-size: clamp(2.5rem, 5vw, 3rem);
+            color: #02112b
             margin-bottom: 0.5rem;
         } 
         p { 
@@ -42,11 +42,10 @@
             display: none !important;
         }
 
-        /* NEW: Blur Class for the main content when a modal is active */
         .blurred {
-            filter: blur(8px); /* Increased blur strength */
+            filter: blur(8px);
             transition: filter 0.3s ease;
-            pointer-events: none; /* Disable interaction with blurred content */
+            pointer-events: none;
             user-select: none;
         }
 
