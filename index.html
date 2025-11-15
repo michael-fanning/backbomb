@@ -361,26 +361,24 @@
 </head>
     
 <body>
-    <!-- Back Button (Only visible during gameplay) -->
     <button id="backToMenu" class="hidden" aria-label="Back to Main Menu">
         &times;
     </button>
     
-    <!-- MAIN MENU SCREEN -->
+    <!-- Main Menu -->
     <div id="mainMenu">
         <h1>Backbomb</h1>
         <p class="menu-description">Click tiles to search for diamonds. Find a mine and lose!</p>
         
         <div id="difficultySelection"> </div>
         
-        <!-- NEW HOW TO PLAY BUTTON -->
         <button id="howToPlayBtn" class="difficulty-btn">How to Play</button>
 
     </div>
 
-    <!-- GAME CONTENT (Hidden until start) -->
+    <!-- Game Content -->
     <div id="gameContent" class="hidden">
-        <!-- REMOVED: The redundant H1 title that looked like a second menu -->
+        <h1>Backbomb</h1>
         <h3 id="gameDescription"></h3>
         <div class="grid" id="grid"></div>
         <p id="status">Money: $0</p>
@@ -390,7 +388,7 @@
         </div>
     </div>
 
-    <!-- END SCREEN -->
+    <!-- End Screen -->
     <div id="endScreen" class="end-screen hidden">
         <h2 id="endMessage"></h2> 
         <button id="endResetButton" class="hidden">Play Again</button>
