@@ -329,7 +329,6 @@
         /* FIX: Increased hover contrast and added subtle movement for feedback */
         .carousel-btn:hover:not(:disabled) {
             background: #041f7a;
-            color: white; /* Added for strict clarity, as it should already be white */
             transform: translateY(-1px); 
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
@@ -374,7 +373,8 @@
         &times;
     </button>
     
-        <div id="mainMenu">
+    <!-- Main Menu -->
+    <div id="mainMenu">
         <h1>Backbomb</h1>
         <p class="menu-description">Click tiles to search for diamonds. Find a mine and lose!</p>
         
@@ -384,7 +384,8 @@
 
     </div>
 
-        <div id="gameContent" class="hidden">
+    <!-- Game Content -->
+    <div id="gameContent" class="hidden">
         <h1>Backbomb</h1>
         <h3 id="gameDescription"></h3>
         <div class="grid" id="grid"></div>
@@ -395,12 +396,14 @@
         </div>
     </div>
 
-        <div id="endScreen" class="end-screen hidden">
+    <!-- End Screen -->
+    <div id="endScreen" class="end-screen hidden">
         <h2 id="endMessage"></h2> 
         <button id="endResetButton" class="hidden">Play Again</button>
     </div>
 
-        <div id="tutorialModal" class="modal hidden">
+    <!-- TUTORIAL MODAL (Hidden by default) -->
+    <div id="tutorialModal" class="modal hidden">
         <div class="modal-content">
             <button class="close-btn" id="closeTutorialBtn">&times;</button>
             <h2>How to Play Backbomb</h2>
@@ -421,18 +424,21 @@
             </div>
 
             <div class="carousel-nav">
-                                <button class="carousel-btn" id="prevBtn" disabled>Previous</button>
+                <!-- prevBtn is disabled in HTML, correctly enabled via JS after first click -->
+                <button class="carousel-btn" id="prevBtn" disabled>Previous</button>
                 <div class="dots" id="carouselDots">
                     <span class="dot active" data-dot="0"></span>
                     <span class="dot" data-dot="1"></span>
                     <span class="dot" data-dot="2"></span>
                 </div>
-                                <button class="carousel-btn" id="nextBtn">Next</button>
+                <!-- nextBtn is NOT disabled in HTML, correctly enabled until last slide -->
+                <button class="carousel-btn" id="nextBtn">Next</button>
             </div>
         </div>
     </div>
     
-        <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1002;"></canvas>
+    <!-- CONFETTI CANVAS -->
+    <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1002;"></canvas>
     
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
