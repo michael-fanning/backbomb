@@ -279,9 +279,15 @@
         }
         .close-btn:hover { color: #010E26; }
 
+        /* FIX: Added min-height to prevent modal collapse/overlap issues */
         .carousel-container {
             position: relative;
             margin-top: 20px;
+            /* FIX: Ensure container has height for content not to overlap outside */
+            min-height: 250px; 
+            display: flex;
+            align-items: flex-start;
+            width: 100%;
         }
 
         .carousel-slide {
@@ -296,9 +302,10 @@
             align-items: center;
         }
 
+        /* FIX: Only the active slide should be in the flow (position: relative) */
         .carousel-slide.active {
             opacity: 1;
-            position: relative; /* Bring active slide back to flow */
+            position: relative; 
         }
 
         .carousel-slide img {
@@ -314,6 +321,7 @@
             display: flex;
             justify-content: space-between;
             margin-top: 20px;
+            width: 100%; /* Ensure navigation spans the width */
         }
         .carousel-btn {
             background: #548FF7;
@@ -328,7 +336,7 @@
         
         /* FIX: Increased hover contrast and added subtle movement for feedback */
         .carousel-btn:hover:not(:disabled) {
-            background: #041f7a;
+            background: #041f7a; /* Darker blue on hover */
             transform: translateY(-1px); 
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
@@ -373,7 +381,6 @@
         &times;
     </button>
     
-    <!-- Main Menu -->
     <div id="mainMenu">
         <h1>Backbomb</h1>
         <p class="menu-description">Click tiles to search for diamonds. Find a mine and lose!</p>
@@ -384,7 +391,6 @@
 
     </div>
 
-    <!-- Game Content -->
     <div id="gameContent" class="hidden">
         <h1>Backbomb</h1>
         <h3 id="gameDescription"></h3>
@@ -396,49 +402,45 @@
         </div>
     </div>
 
-    <!-- End Screen -->
     <div id="endScreen" class="end-screen hidden">
         <h2 id="endMessage"></h2> 
         <button id="endResetButton" class="hidden">Play Again</button>
     </div>
 
-    <!-- TUTORIAL MODAL (Hidden by default) -->
     <div id="tutorialModal" class="modal hidden">
         <div class="modal-content">
             <button class="close-btn" id="closeTutorialBtn">&times;</button>
             <h2>How to Play Backbomb</h2>
 
             <div class="carousel-container">
-                <div class="carousel-slide active" data-slide="0">
-                    <!-- Images were kept exactly as you provided them -->
-                    <img src="tutorial1.png" alt="Tutorial Image 1" onerror="this.onerror=null; this.src='https://placehold.co/250x150/548FF7/ffffff?text=1.+Find+Diamond';">
-                    <p><strong>Step 1: Find the Diamonds (💎).</strong> Click a tile that is not adjacent to a mine to find a diamond and increase your money by $1.</p>
-                </div>
-                <div class="carousel-slide" data-slide="1">
-                    <img src="tutorial2.png" alt="Tutorial Image 2" onerror="this.onerror=null; this.src='https://placehold.co/250x150/FCEA47/000000?text=2.+Avoid+Adjacent';">
-                    <p><strong>Step 2: Avoid Adjacent Tiles (🟡).</strong> Tiles colored yellow after a click are adjacent to a bomb. They are safe but contain no diamond. Treat them as warnings!</p>
-                </div>
-                <div class="carousel-slide" data-slide="2">
-                    <img src="tutorial3.png" alt="Tutorial Image 3" onerror="this.onerror=null; this.src='https://placehold.co/250x150/FF0000/ffffff?text=3.+Dodge+Bomb';">
-                    <p><strong>Step 3: Dodge the Bomb (💣).</strong> If you click a bomb, you lose half your current money and the board resets. Lose all your money and it's Game Over!</p>
+                <div id="carouselInner">
+                    <div class="carousel-slide active" data-slide="0">
+                        <img src="tutorial1.png" alt="Tutorial Image 1" onerror="this.onerror=null; this.src='https://placehold.co/250x150/548FF7/ffffff?text=1.+Find+Diamond';">
+                        <p><strong>Step 1: Find the Diamonds (💎).</strong> Click a tile that is not adjacent to a mine to find a diamond and increase your money by $1.</p>
+                    </div>
+                    <div class="carousel-slide" data-slide="1">
+                        <img src="tutorial2.png" alt="Tutorial Image 2" onerror="this.onerror=null; this.src='https://placehold.co/250x150/FCEA47/000000?text=2.+Avoid+Adjacent';">
+                        <p><strong>Step 2: Avoid Adjacent Tiles (🟡).</strong> Tiles colored yellow after a click are adjacent to a bomb. They are safe but contain no diamond. Treat them as warnings!</p>
+                    </div>
+                    <div class="carousel-slide" data-slide="2">
+                        <img src="tutorial3.png" alt="Tutorial Image 3" onerror="this.onerror=null; this.src='https://placehold.co/250x150/FF0000/ffffff?text=3.+Dodge+Bomb';">
+                        <p><strong>Step 3: Dodge the Bomb (💣).</strong> If you click a bomb, you lose half your current money and the board resets. Lose all your money and it's Game Over!</p>
+                    </div>
                 </div>
             </div>
 
             <div class="carousel-nav">
-                <!-- prevBtn is disabled in HTML, correctly enabled via JS after first click -->
                 <button class="carousel-btn" id="prevBtn" disabled>Previous</button>
                 <div class="dots" id="carouselDots">
                     <span class="dot active" data-dot="0"></span>
                     <span class="dot" data-dot="1"></span>
                     <span class="dot" data-dot="2"></span>
                 </div>
-                <!-- nextBtn is NOT disabled in HTML, correctly enabled until last slide -->
                 <button class="carousel-btn" id="nextBtn">Next</button>
             </div>
         </div>
     </div>
     
-    <!-- CONFETTI CANVAS -->
     <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1002;"></canvas>
     
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -505,6 +507,15 @@
                 showSlide(currentSlide);
             }
         }
+        
+        // Function to dynamically set the height of the carousel container
+        function setCarouselHeight() {
+            const innerContainer = document.getElementById('carouselInner');
+            const activeSlide = document.querySelector('.carousel-slide.active');
+            if (activeSlide) {
+                innerContainer.style.height = `${activeSlide.offsetHeight}px`;
+            }
+        }
 
         function showSlide(index) {
             const slides = document.querySelectorAll('.carousel-slide');
@@ -513,7 +524,13 @@
             const nextBtn = document.getElementById('nextBtn');
             
             slides.forEach((slide, i) => {
-                slide.classList.toggle('active', i === index);
+                // Use setTimeout to ensure the height is calculated after the slide visibility changes
+                setTimeout(() => {
+                    slide.classList.toggle('active', i === index);
+                    if (i === index) {
+                        setCarouselHeight(); // Set height when the slide is active
+                    }
+                }, 50);
             });
             
             dots.forEach((dot, i) => {
