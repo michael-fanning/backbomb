@@ -323,6 +323,7 @@
             cursor: pointer;
             font-weight: bold;
             transition: 0.2s;
+            z-index: 99999;
         }
 
         /* FIX: Increased hover contrast and added subtle movement for feedback */
@@ -513,7 +514,7 @@
 
             // Set button disabled states based on the current slide index
             prevBtn.disabled = index === 0;
-            nextBtn.disabled = index === totalSlides - 1;
+            //nextBtn.disabled = index === totalSlides - 1;
 
             currentSlide = index;
         }
