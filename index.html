@@ -1,812 +1,1665 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Backbomb</title>
-    <link rel="icon" type="image/png" href="favicon.png">
-    
-    <style>
-        html, body { 
-            overflow-x: hidden;
-            height: 100%;
-        }
-        body { 
-            font-family: 'Inter', sans-serif; 
-            margin: 0;
-            text-align: center; 
-            min-height: 100vh;
-            background-color: #E5EFFF; /*Light baby blue*/
-            color: #010E26;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
 
-        h1 { 
-            font-size: clamp(2.5rem, 5vw, 3rem);
-            color: #02112b
-            margin-bottom: 0.5rem;
-        } 
-        p { 
-            font-size: 16px; 
-            color: #010E26;
-            margin-bottom: 25px;
-        }
+    <meta charset="UTF-8">
 
-        /* Utility Class */
-        .hidden {
-            display: none !important;
-        }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        .blurred {
-            filter: blur(8px);
-            transition: filter 0.3s ease;
-            pointer-events: none;
-            user-select: none;
-        }
+    <title>Backbomb</title>
 
-        #backToMenu {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: #041f7a; /* Navy blue square */
-            color: white;
-            font-size: 30px;
-            width: 40px;
-            height: 40px;
-            border: none;
-            border-radius: 8px; /* Rounded corners */
-            cursor: pointer;
-            line-height: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            transition: background 0.2s ease, transform 0.1s;
-            z-index: 1003; /* Higher than confetti */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
+    <link rel="icon" type="image/png" href="favicon.png">
 
-        #backToMenu:hover {
-            background: #2c4494; /* Slightly lighter navy blue on hover */
-            transform: scale(1.05);
-        }
+    
 
-        /* --- Game Container Styling --- */
-        #gameContent.hidden {
-            display: none;
-        }
-        
-        /* Ensure H3 is styled nicely inside the game content */
-        #gameContent h3 {
-            font-size: 1.25rem;
-            margin-bottom: 1.5rem;
-            color: #041f7a;
-            font-weight: 600;
-        }
+    <style>
 
-        .grid { 
-            display: grid; 
-            gap: 5px; 
-            justify-content: center; 
-            margin: 20px auto; 
-            grid-template-columns: var(--grid-columns, repeat(7, 1fr)); 
-            width: min(90vw, 420px); 
-        }
+        html, body { 
 
-        .cell { 
-            aspect-ratio: 1 / 1; 
-            background: #ccc; 
-            display: flex; align-items: center; 
-            justify-content: center; 
-            font-size: clamp(16px, 4vw, 24px); 
-            cursor: pointer; 
-            border: 2px solid #444;
-            border-radius: 4px;
-            transition: transform 0.3s ease, background 0.3s ease; 
-            transform-style: preserve-3d;
-        }
-        .cell:hover:not(.revealed):not(.safe) { background: #bbb; } /* Only hover if not revealed */
+            overflow-x: hidden;
 
-        /* Revealed states */
-        .cell.revealed { 
-            background: lightgreen; 
-            transform: rotateY(180deg); 
-            cursor: default; 
-        }
-        .cell.safe {
-            background: #fcea47; /* Pale Yellow */
-            transform: rotateY(180deg);
-            cursor: default;
-        }
-        .cell.mine { 
-            background: red; 
-            transform: rotateY(180deg); 
-        }
+            height: 100%;
 
-        /* --- Main Menu Styling --- */
-        #mainMenu {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: white;
-            padding: 40px 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 100%;
-        }
+        }
 
-        .menu-description {
-            font-size: 18px;
-            margin-bottom: 30px;
-            color: #444;
-        }
+        body { 
 
-        #difficultySelection {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+            font-family: 'Inter', sans-serif; 
 
-        .difficulty-btn, #howToPlayBtn {
-            padding: 15px 25px; /* Slightly larger buttons since they are the main action */
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            background: #99BFFF; 
-            color: #010E26;
-            border: 2px solid transparent;
-            border-radius: 8px;
-            transition: 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            flex-grow: 1;
-            min-width: 120px;
-            margin-top: 10px; /* Separator for How To Play button */
-        }
+            margin: 0;
 
-        .difficulty-btn:hover, #howToPlayBtn:hover {
-            background: #548FF7;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
+            text-align: center; 
 
-        /* --- End Screen Styling --- */
-        .end-screen { 
-            position: fixed; top: 0; left: 0; 
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6); /* FIX: Reduced opacity from 0.9 to 0.6 */ 
-            color: white; display: flex;
-            flex-direction: column; align-items: center; 
-            justify-content: center;
-            z-index: 1000; 
-            transition: opacity 0.5s ease-in-out; 
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .end-screen.hidden { 
-            display: none; 
-            opacity: 0; 
-        }
-        .end-screen h2 { 
-            font-size: clamp(24px, 5vw, 32px);
-            font-weight: bold; 
-            text-transform: uppercase; 
-            animation: fadeIn 1s ease; 
-            margin-bottom: 20px;
-            text-align: center;
-        }
+            min-height: 100vh;
 
-        /* Buttons */
-        #resetContainer {
-            display: none;
-            margin-top: 20px;
-        }
-        #resetButton { 
-            padding: 12px 24px; 
-            font-size: 18px; 
-            cursor: pointer; 
-            background: #99BFFF; 
-            border: none; 
-            border-radius: 5px; 
-            font-weight: bold; 
-            transition: 0.3s ease;
-        }
-        #resetButton:hover { background: #548FF7; }
+            background-color: #E5EFFF; /*Light baby blue*/
 
-        #endResetButton { 
-            padding: 20px 40px;
-            font-size: 24px;
-            cursor: pointer; 
-            background: #99BFFF; 
-            color: #010E26;
-            border: 4px solid #548FF7;
-            border-radius: 8px; 
-            font-weight: bold; 
-            transition: 0.3s ease;
-            margin-bottom: 30px;
-            z-index: 1001;
-        }
+            color: #010E26;
 
-        #endResetButton:hover { 
-            background: #548FF7; 
-            color: white; 
-        }
+            display: flex;
 
-        /* --- Tutorial Modal/Carousel Styling --- */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6); /* FIX: Reduced opacity from 0.8 to 0.6 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
+            flex-direction: column;
 
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            position: relative;
-            text-align: center;
-        }
+            align-items: center;
 
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #444;
-            border: none;
-            background: none;
-        }
-        .close-btn:hover { color: #010E26; }
+            justify-content: center;
 
-        .carousel-container {
-            position: relative;
-            margin-top: 20px;
-        }
+            padding: 20px;
 
-        .carousel-slide {
-            transition: opacity 0.5s ease;
-            opacity: 0;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+            box-sizing: border-box;
 
-        .carousel-slide.active {
-            opacity: 1;
-            position: relative; /* Bring active slide back to flow */
-        }
-
-        .carousel-slide img {
-            width: 100%;
-            max-width: 250px;
-            height: auto;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .carousel-nav {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        .carousel-btn {
-            background: #548FF7;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-        .carousel-btn:disabled {
-            background: #ccc;
-            cursor: default;
-        }
-        .carousel-btn:hover:not(:disabled) {
-            background: #041f7a;
-        }
-        .dots {
-            margin: 0 10px;
-            display: flex;
-            align-items: center;
-        }
-        .dot {
-            height: 10px;
-            width: 10px;
-            margin: 0 4px;
-            background-color: #bbb;
-            border-radius: 50%;
-            display: inline-block;
-            transition: background-color 0.3s ease;
-        }
-        .dot.active {
-            background-color: #548FF7;
-        }
+        }
 
 
-        /* Animation */
-        @keyframes fadeIn {
-            0% { opacity: 0; transform: translateY(30px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+
+        h1 { 
+
+            font-size: clamp(2.5rem, 5vw, 3rem);
+
+            color: #02112b;
+
+            margin-bottom: 0.5rem;
+
+        } 
+
+        p { 
+
+            font-size: 16px; 
+
+            color: #010E26;
+
+            margin-bottom: 25px;
+
+        }
+
+
+
+        /* Utility Class */
+
+        .hidden {
+
+            display: none !important;
+
+        }
+
+
+
+        .blurred {
+
+            filter: blur(8px);
+
+            transition: filter 0.3s ease;
+
+            pointer-events: none;
+
+            user-select: none;
+
+        }
+
+
+
+        #backToMenu {
+
+            position: fixed;
+
+            top: 20px;
+
+            left: 20px;
+
+            background: #041f7a; /* Navy blue square */
+
+            color: white;
+
+            font-size: 30px;
+
+            width: 40px;
+
+            height: 40px;
+
+            border: none;
+
+            border-radius: 8px; /* Rounded corners */
+
+            cursor: pointer;
+
+            line-height: 1;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 0;
+
+            transition: background 0.2s ease, transform 0.1s;
+
+            z-index: 1003; /* Higher than confetti */
+
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+
+        }
+
+
+
+        #backToMenu:hover {
+
+            background: #2c4494; /* Slightly lighter navy blue on hover */
+
+            transform: scale(1.05);
+
+        }
+
+
+
+        /* --- Game Container Styling --- */
+
+        #gameContent.hidden {
+
+            display: none;
+
+        }
+
+        
+
+        /* Ensure H3 is styled nicely inside the game content */
+
+        #gameContent h3 {
+
+            font-size: 1.25rem;
+
+            margin-bottom: 1.5rem;
+
+            color: #041f7a;
+
+            font-weight: 600;
+
+        }
+
+
+
+        .grid { 
+
+            display: grid; 
+
+            gap: 5px; 
+
+            justify-content: center; 
+
+            margin: 20px auto; 
+
+            grid-template-columns: var(--grid-columns, repeat(7, 1fr)); 
+
+            width: min(90vw, 420px); 
+
+        }
+
+
+
+        .cell { 
+
+            aspect-ratio: 1 / 1; 
+
+            background: #ccc; 
+
+            display: flex; align-items: center; 
+
+            justify-content: center; 
+
+            font-size: clamp(16px, 4vw, 24px); 
+
+            cursor: pointer; 
+
+            border: 2px solid #444;
+
+            border-radius: 4px;
+
+            transition: transform 0.3s ease, background 0.3s ease; 
+
+            transform-style: preserve-3d;
+
+        }
+
+        .cell:hover:not(.revealed):not(.safe) { background: #bbb; } /* Only hover if not revealed */
+
+
+
+        /* Revealed states */
+
+        .cell.revealed { 
+
+            background: lightgreen; 
+
+            transform: rotateY(180deg); 
+
+            cursor: default; 
+
+        }
+
+        .cell.safe {
+
+            background: #fcea47; /* Pale Yellow */
+
+            transform: rotateY(180deg);
+
+            cursor: default;
+
+        }
+
+        .cell.mine { 
+
+            background: red; 
+
+            transform: rotateY(180deg); 
+
+        }
+
+
+
+        /* --- Main Menu Styling --- */
+
+        #mainMenu {
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: white;
+
+            padding: 40px 30px;
+
+            border-radius: 12px;
+
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+            max-width: 400px;
+
+            width: 100%;
+
+        }
+
+
+
+        .menu-description {
+
+            font-size: 18px;
+
+            margin-bottom: 30px;
+
+            color: #444;
+
+        }
+
+
+
+        #difficultySelection {
+
+            display: flex;
+
+            gap: 15px;
+
+            margin-top: 20px;
+
+            margin-bottom: 30px;
+
+            flex-wrap: wrap;
+
+            justify-content: center;
+
+        }
+
+
+
+        .difficulty-btn, #howToPlayBtn {
+
+            padding: 15px 25px; /* Slightly larger buttons since they are the main action */
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            background: #99BFFF; 
+
+            color: #010E26;
+
+            border: 2px solid transparent;
+
+            border-radius: 8px;
+
+            transition: 0.2s ease;
+
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+            flex-grow: 1;
+
+            min-width: 120px;
+
+            margin-top: 10px; /* Separator for How To Play button */
+
+        }
+
+
+
+        .difficulty-btn:hover, #howToPlayBtn:hover {
+
+            background: #548FF7;
+
+            color: white;
+
+            transform: translateY(-2px);
+
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+        }
+
+
+
+        /* --- End Screen Styling --- */
+
+        .end-screen { 
+
+            position: fixed; top: 0; left: 0; 
+
+            width: 100%; height: 100%;
+
+            background: rgba(0, 0, 0, 0.6); /* FIX: Reduced opacity from 0.9 to 0.6 */ 
+
+            color: white; display: flex;
+
+            flex-direction: column; align-items: center; 
+
+            justify-content: center;
+
+            z-index: 1000; 
+
+            transition: opacity 0.5s ease-in-out; 
+
+            padding: 20px;
+
+            box-sizing: border-box;
+
+        }
+
+        .end-screen.hidden { 
+
+            display: none; 
+
+            opacity: 0; 
+
+        }
+
+        .end-screen h2 { 
+
+            font-size: clamp(24px, 5vw, 32px);
+
+            font-weight: bold; 
+
+            text-transform: uppercase; 
+
+            animation: fadeIn 1s ease; 
+
+            margin-bottom: 20px;
+
+            text-align: center;
+
+        }
+
+
+
+        /* Buttons */
+
+        #resetContainer {
+
+            display: none;
+
+            margin-top: 20px;
+
+        }
+
+        #resetButton { 
+
+            padding: 12px 24px; 
+
+            font-size: 18px; 
+
+            cursor: pointer; 
+
+            background: #99BFFF; 
+
+            border: none; 
+
+            border-radius: 5px; 
+
+            font-weight: bold; 
+
+            transition: 0.3s ease;
+
+        }
+
+        #resetButton:hover { background: #548FF7; }
+
+
+
+        #endResetButton { 
+
+            padding: 20px 40px;
+
+            font-size: 24px;
+
+            cursor: pointer; 
+
+            background: #99BFFF; 
+
+            color: #010E26;
+
+            border: 4px solid #548FF7;
+
+            border-radius: 8px; 
+
+            font-weight: bold; 
+
+            transition: 0.3s ease;
+
+            margin-bottom: 30px;
+
+            z-index: 1001;
+
+        }
+
+
+
+        #endResetButton:hover { 
+
+            background: #548FF7; 
+
+            color: white; 
+
+        }
+
+
+
+        /* --- Tutorial Modal/Carousel Styling --- */
+
+        .modal {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            background: rgba(0, 0, 0, 0.6);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            z-index: 2000;
+
+        }
+
+
+
+        .modal-content {
+
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 10px;
+
+            max-width: 500px;
+
+            width: 90%;
+
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+
+            position: relative;
+
+            text-align: center;
+
+        }
+
+
+
+        .close-btn {
+
+            position: absolute;
+
+            top: 10px;
+
+            right: 10px;
+
+            font-size: 24px;
+
+            cursor: pointer;
+
+            color: #444;
+
+            border: none;
+
+            background: none;
+
+        }
+
+        .close-btn:hover { color: #010E26; }
+
+
+
+        .carousel-container {
+
+            position: relative;
+
+            margin-top: 20px;
+
+        }
+
+
+
+        .carousel-slide {
+
+            transition: opacity 0.5s ease;
+
+            opacity: 0;
+
+            position: absolute;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+        }
+
+
+
+        .carousel-slide.active {
+
+            opacity: 1;
+
+            position: relative; /* Bring active slide back to flow */
+
+        }
+
+
+
+        .carousel-slide img {
+
+            width: 100%;
+
+            max-width: 250px;
+
+            height: auto;
+
+            border-radius: 6px;
+
+            margin-bottom: 15px;
+
+            box-shadow: none;
+
+        }
+
+
+
+        .carousel-nav {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            margin-top: 20px;
+
+        }
+
+        .carousel-btn {
+
+            background: #548FF7;
+
+            color: white;
+
+            padding: 10px 20px;
+
+            border: none;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+            transition: 0.2s;
+
+        }
+
+        
+
+        /* FIX: Increased hover contrast and added subtle movement for feedback */
+
+        .carousel-btn:hover:not(:disabled) {
+
+            background: #041f7a;
+
+            transform: translateY(-1px); 
+
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+
+        }
+
+        
+
+        /* Ensure disabled state is visually clear and non-interactive */
+
+        .carousel-btn:disabled {
+
+            background: #ccc;
+
+            cursor: default;
+
+            transform: none; /* Override hover transform if disabled */
+
+            box-shadow: none;
+
+        }
+
+        
+
+        .dots {
+
+            margin: 0 10px;
+
+            display: flex;
+
+            align-items: center;
+
+        }
+
+        .dot {
+
+            height: 10px;
+
+            width: 10px;
+
+            margin: 0 4px;
+
+            background-color: #bbb;
+
+            border-radius: 50%;
+
+            display: inline-block;
+
+            transition: background-color 0.3s ease;
+
+        }
+
+        .dot.active {
+
+            background-color: #548FF7;
+
+        }
+
+
+
+
+
+        /* Animation */
+
+        @keyframes fadeIn {
+
+            0% { opacity: 0; transform: translateY(30px); }
+
+            100% { opacity: 1; transform: translateY(0); }
+
+        }
+
+    </style>
+
 </head>
-    
+
+    
+
 <body>
-    <button id="backToMenu" class="hidden" aria-label="Back to Main Menu">
-        &times;
-    </button>
-    
-    <!-- Main Menu -->
-    <div id="mainMenu">
-        <h1>Backbomb</h1>
-        <p class="menu-description">Click tiles to search for diamonds. Find a mine and lose!</p>
-        
-        <div id="difficultySelection"> </div>
-        
-        <button id="howToPlayBtn" class="difficulty-btn">How to Play</button>
 
-    </div>
+    <button id="backToMenu" class="hidden" aria-label="Back to Main Menu">
 
-    <!-- Game Content -->
-    <div id="gameContent" class="hidden">
-        <h1>Backbomb</h1>
-        <h3 id="gameDescription"></h3>
-        <div class="grid" id="grid"></div>
-        <p id="status">Money: $0</p>
+        &times;
 
-        <div id="resetContainer" style="margin-top: 1.5rem; display: none;">
-            <button id="resetButton">Restart Board</button>
-        </div>
-    </div>
+    </button>
 
-    <!-- End Screen -->
-    <div id="endScreen" class="end-screen hidden">
-        <h2 id="endMessage"></h2> 
-        <button id="endResetButton" class="hidden">Play Again</button>
-    </div>
+    
 
-    <!-- TUTORIAL MODAL (Hidden by default) -->
-    <div id="tutorialModal" class="modal hidden">
-        <div class="modal-content">
-            <button class="close-btn" id="closeTutorialBtn">&times;</button>
-            <h2>How to Play Backbomb</h2>
+    <!-- Main Menu -->
 
-            <div class="carousel-container">
-                <div class="carousel-slide active" data-slide="0">
-                    <img src="https://placehold.co/400x400/99BFFF/010E26?text=tutorial1.png" alt="Tutorial Image 1">
-                    <p><strong>Step 1: Find the Diamonds (💎).</strong> Click a tile that is not adjacent to a mine to find a diamond and increase your money by $1.</p>
-                </div>
-                <div class="carousel-slide" data-slide="1">
-                    <img src="https://placehold.co/400x400/548FF7/FFFFFF?text=tutorial2.png" alt="Tutorial Image 2">
-                    <p><strong>Step 2: Avoid Adjacent Tiles (🟡).</strong> Tiles colored yellow after a click are adjacent to a bomb. They are safe but contain no diamond. Treat them as warnings!</p>
-                </div>
-                <div class="carousel-slide" data-slide="2">
-                    <img src="https://placehold.co/400x400/041f7a/FFFFFF?text=tutorial3.png" alt="Tutorial Image 3">
-                    <p><strong>Step 3: Dodge the Bomb (💣).</strong> If you click a bomb, you lose half your current money and the board resets. Lose all your money and it's Game Over!</p>
-                </div>
-            </div>
+    <div id="mainMenu">
 
-            <div class="carousel-nav">
-                <button class="carousel-btn" id="prevBtn" disabled>Previous</button>
-                <div class="dots" id="carouselDots">
-                    <span class="dot active" data-dot="0"></span>
-                    <span class="dot" data-dot="1"></span>
-                    <span class="dot" data-dot="2"></span>
-                </div>
-                <button class="carousel-btn" id="nextBtn">Next</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- CONFETTI CANVAS -->
-    <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1002;"></canvas>
-    
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+        <h1>Backbomb</h1>
 
-    <script>
-        // Use 'let' for dynamic game settings
-        let gridSize = 7;
-        let mineCount = 5;
-        let selectedDifficulty = 'medium';
+        <p class="menu-description">Click tiles to search for diamonds. Find a mine and lose!</p>
 
-        let balance = 0;
-        let mineIndices = [];
-        let revealedCells = 0;
-        let gameEnded = false;
-        let hitMine = false;
-        let firstClick = true; 
-        
-        // Carousel State
-        let currentSlide = 0;
-        const totalSlides = 3;
+        
 
-        const myCanvas = document.getElementById('confetti-canvas');
-        const myConfetti = confetti.create(myCanvas, {
-            resize: true,
-            useWorker: true
-        });
+        <div id="difficultySelection"> </div>
 
-        // Get references to the main content containers
-        const mainMenu = document.getElementById('mainMenu');
-        const gameContent = document.getElementById('gameContent');
-        const tutorialModal = document.getElementById('tutorialModal');
-        const endScreen = document.getElementById('endScreen');
+        
 
-        // DIFFICULTY SETTINGS
-        const difficulties = {
-            'easy': { size: 5, mines: 2, label: 'Easy' },
-            'medium': { size: 7, mines: 5, label: 'Medium' },
-            'hard': { size: 8, mines: 7, label: 'Hard' }
-        };
+        <button id="howToPlayBtn" class="difficulty-btn">How to Play</button>
 
-        // --- BLUR LOGIC (NEW) ---
-        function applyBlur() {
-            // Check which main container is visible and apply the blur class
-            if (!mainMenu.classList.contains('hidden')) {
-                mainMenu.classList.add('blurred');
-            } else if (!gameContent.classList.contains('hidden')) {
-                gameContent.classList.add('blurred');
-            }
-        }
 
-        function removeBlur() {
-            mainMenu.classList.remove('blurred');
-            gameContent.classList.remove('blurred');
-        }
 
-        // --- CAROUSEL LOGIC ---
+    </div>
 
-        function updateCarousel(direction) {
-            currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
-            showSlide(currentSlide);
-        }
 
-        function showSlide(index) {
-            const slides = document.querySelectorAll('.carousel-slide');
-            const dots = document.querySelectorAll('.dot');
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            
-            slides.forEach((slide, i) => {
-                slide.classList.toggle('active', i === index);
-            });
-            
-            dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === index);
-            });
 
-            prevBtn.disabled = index === 0;
-            nextBtn.disabled = index === totalSlides - 1;
-            
-            currentSlide = index;
-        }
+    <!-- Game Content -->
 
-        function openTutorial() {
-            tutorialModal.classList.remove('hidden');
-            applyBlur(); // Apply blur when tutorial modal opens
-            currentSlide = 0;
-            showSlide(currentSlide);
-        }
+    <div id="gameContent" class="hidden">
 
-        function closeTutorial() {
-            tutorialModal.classList.add('hidden');
-            removeBlur(); // Remove blur when tutorial modal closes
-        }
+        <h1>Backbomb</h1>
 
-        // --- MENU LOGIC ---
+        <h3 id="gameDescription"></h3>
 
-        function renderDifficultyButtons() {
-            const container = document.getElementById('difficultySelection');
-            container.innerHTML = '';
-            
-            Object.keys(difficulties).forEach(key => {
-                const btn = document.createElement('button');
-                btn.classList.add('difficulty-btn');
-                btn.innerText = difficulties[key].label;
-                btn.dataset.difficulty = key;
-                
-                btn.addEventListener('click', () => {
-                    selectDifficulty(key);
-                    startGame();
-                });
-                
-                container.appendChild(btn);
-            });
-        }
+        <div class="grid" id="grid"></div>
 
-        function selectDifficulty(key) {
-            selectedDifficulty = key;
-            gridSize = difficulties[key].size;
-            mineCount = difficulties[key].mines;
-        }
-        
-        function startGame() {
-            document.getElementById("grid").style.setProperty('--grid-columns', `repeat(${gridSize}, 1fr)`);
-            
-            mainMenu.classList.add('hidden');
-            gameContent.classList.remove('hidden');
-            document.getElementById('backToMenu').classList.remove('hidden'); // Show back button
-            
-            // Get the label for the currently selected difficulty
-            const difficultyLabel = difficulties[selectedDifficulty].label;
-            
-            // Update the description paragraph with the difficulty label
-            document.getElementById('gameDescription').innerText = `Difficulty: ${difficultyLabel} | Mines: ${mineCount}`;
+        <p id="status">Money: $0</p>
 
-            resetGame(false); 
-        }
 
-        // --- GAME LOGIC ---
 
-        // Checks if a tile is adjacent to a bomb.
-        function isAdjacent(index) {
-            for (const bombIndex of mineIndices) {
-                const row = Math.floor(index / gridSize);
-                const col = index % gridSize;
-                const bombRow = Math.floor(bombIndex / gridSize);
-                const bombCol = bombIndex % gridSize;
-                
-                const rowDiff = Math.abs(row - bombRow);
-                const colDiff = Math.abs(col - bombCol);
-                
-                // If tile is next to a bomb (within 1 unit in both directions)
-                if (rowDiff <= 1 && colDiff <= 1) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        
-        // Places mines, excluding the first clicked tile
-        function initializeMines(excludeIndex = -1) { 
-            mineIndices = [];
-            const totalCells = gridSize * gridSize;
-            const possibleMineIndices = new Set();
-            
-            // 1. Fill Set with all possible indices, excluding the first clicked tile
-            for (let i = 0; i < totalCells; i++) {
-                if (i !== excludeIndex) {
-                    possibleMineIndices.add(i);
-                }
-            }
-        
-            // 2. Select 'mineCount' random indices from the Set
-            const indicesArray = Array.from(possibleMineIndices);
-            for (let i = 0; i < mineCount; i++) {
-                if (indicesArray.length === 0) break;
-                
-                const randomIndex = Math.floor(Math.random() * indicesArray.length);
-                const selectedIndex = indicesArray.splice(randomIndex, 1)[0]; // Remove and get element
-                mineIndices.push(selectedIndex);
-            }
-        }
-        
-        function createGrid() {
-            const grid = document.getElementById("grid");
-            grid.innerHTML = "";
-            for (let i = 0; i < gridSize * gridSize; i++) {
-                const cell = document.createElement("div");
-                cell.classList.add("cell");
-                cell.dataset.index = i;
-                cell.addEventListener("click", () => revealCell(i));
-                grid.appendChild(cell);
-            }
-        }
+        <div id="resetContainer" style="margin-top: 1.5rem; display: none;">
 
-        function revealBoardOnEnd() {
-            document.querySelectorAll(".cell").forEach(c => {
-                const cIndex = parseInt(c.dataset.index);
-                const isTileAdjacent = isAdjacent(cIndex);
+            <button id="resetButton">Restart Board</button>
 
-                if (mineIndices.includes(cIndex)) {
-                    // Reveal mines
-                    c.classList.add("mine");
-                    c.innerHTML = "💣";
-                    c.style.transform = "rotateY(180deg)";
-                } else if (isTileAdjacent && !c.classList.contains("revealed")) {
-                    // Reveal adjacent safe tiles (yellow) if they haven't been revealed as a diamond
-                    c.classList.add("safe");
-                    c.innerHTML = "";
-                    c.style.transform = "rotateY(180deg)"; 
-                }
-            });
-        }
-        
-        function revealCell(index) {
-            if (gameEnded) return;
-        
-            // Delay mine placement until the first click is made
-            if (firstClick) {
-                initializeMines(index);
-                firstClick = false;
-            }
-        
-            const cell = document.querySelector(`.cell[data-index='${index}']`);
-            if (!cell || cell.classList.contains("revealed") || cell.classList.contains("safe")) return;
-        
-            cell.style.transform = "rotateY(180deg)"; //Flip animation
-        
-            const isMine = mineIndices.includes(index); // Check against the mine array
-        
-            if (isMine) {
-                // Case 1: Hit the Bomb 💣
-                
-                // Call function to reveal the board on loss
-                revealBoardOnEnd();
-        
-                if (balance >= 2) {
-                    balance = Math.floor(balance / 2);
-                } else {
-                    balance = 0;
-                }
-                
-                document.getElementById("status").innerText = `You clicked a bomb! Money: $${balance}`;
-                hitMine = true;
-                freezeBoard();
-                
-                checkEndGame(); 
-                
-                if (gameEnded === false) { 
-                    showResetButton(); // Show restart board option if player still has money
-                }
-            } else if (isAdjacent(index)) {
-                // Case 2: Hit a Safe/Adjacent Tile (Yellow, no diamond)
-                cell.classList.add("safe");
-                cell.innerHTML = "";
-                document.getElementById("status").innerText = `Money: $${balance}`;
-            } else {
-                // Case 3: Hit a Diamond Tile 💎 (Only if not adjacent to a mine)
-                cell.classList.add("revealed");
-                cell.innerHTML = "💎";
-                revealedCells++;
-                balance += 1;
-                document.getElementById("status").innerText = `Money: $${balance}`;
-                checkVictory();
-            }
-        }
-        
-        function freezeBoard() {
-            document.querySelectorAll(".cell").forEach(cell => cell.style.pointerEvents = "none");
-        }
-        
-        function checkVictory() {
-            let totalDiamondTiles = 0;
-            const totalCells = gridSize * gridSize;
-            
-            // Loop through all cells to find the count of true diamond tiles 
-            for (let i = 0; i < totalCells; i++) {
-                if (!mineIndices.includes(i) && !isAdjacent(i)) {
-                    totalDiamondTiles++;
-                }
-            }
-        
-            // Check if the number of revealed green diamond tiles matches the required count
-            if (revealedCells === totalDiamondTiles) {
-                document.getElementById("endMessage").innerText = `VICTORY! You found all the gems and won $${balance}!`;
-                endScreen.classList.remove("hidden");
-                gameEnded = true;
-                showEndResetButton();
-                freezeBoard();
-                
-                // Call function to reveal the board on win
-                revealBoardOnEnd();
-        
-                myConfetti({
-                    particleCount: 150,
-                    spread: 120,
-                    origin: { y: 0.6 }
-                });
+        </div>
 
-                applyBlur(); // Apply blur when victory screen is shown
-            }
-        }
-        
-        function checkEndGame() {
-            if (balance <= 0 && hitMine) {
-                document.getElementById("endMessage").innerText = "Game Over! You lost ALL your money.";
-                endScreen.classList.remove("hidden");
-                gameEnded = true;
-                showEndResetButton();
-                freezeBoard();
-                applyBlur(); // Apply blur when game over screen is shown
-            }
-        }
-        
-        function showResetButton() {
-            // Shows the "Restart Board" button if a mine was hit but the player still has money
-            if (hitMine && gameEnded == false) {
-                document.getElementById("resetContainer").style.display = "block";
-            }
-        }
-        
-        function showEndResetButton() {
-            // Shows the "Play Again" button if the game is fully over (Win or zero cash loss)
-            if (gameEnded) {
-                document.getElementById("endResetButton").classList.remove("hidden");
-                document.getElementById("resetContainer").style.display = "none";
-            }
-        }
-        
-        function resetGame(returnToMenu = true) {
-            // Reset core game state
-            revealedCells = 0;
-            if (returnToMenu) {
-                balance = 0; // Only reset balance if returning to the main menu
-            }
-            gameEnded = false;
-            hitMine = false; 
-            firstClick = true; 
-            mineIndices = []; 
-            
-            // Reset UI elements
-            document.getElementById("status").innerText = `Money: $${balance}`;
-            endScreen.classList.add("hidden");
-            document.getElementById("resetContainer").style.display = "none";
-            document.getElementById("endResetButton").classList.add("hidden"); 
-            document.querySelectorAll(".cell").forEach(cell => cell.style.pointerEvents = "auto");
-            if (typeof myConfetti === 'function') { myConfetti.reset(); }
+    </div>
 
-            removeBlur(); // Always remove blur on reset
-            
-            // Go back to menu or restart game
-            if (returnToMenu) {
-                gameContent.classList.add('hidden');
-                mainMenu.classList.remove('hidden');
-                document.getElementById('backToMenu').classList.add('hidden'); // Hide back button
-            } else {
-                createGrid();
-            }
-        }
-        
-        document.addEventListener('DOMContentLoaded', (event) => {
-            // Event Listeners for Game
-            document.getElementById("resetButton").addEventListener("click", () => {
-                resetGame(false);
-                startGame();
-            });
-            document.getElementById("endResetButton").addEventListener("click", () => {
-                resetGame(true); 
-            });
-            document.getElementById("backToMenu").addEventListener("click", () => resetGame(true)); 
 
-            // Event Listeners for Tutorial Modal
-            document.getElementById("howToPlayBtn").addEventListener("click", openTutorial);
-            document.getElementById("closeTutorialBtn").addEventListener("click", closeTutorial);
-            document.getElementById("prevBtn").addEventListener("click", () => updateCarousel(-1));
-            document.getElementById("nextBtn").addEventListener("click", () => updateCarousel(1));
-            
-            // Initial Menu Setup
-            renderDifficultyButtons();
-            showSlide(currentSlide); // Initialize carousel display
-        });
-    </script>
+
+    <!-- End Screen -->
+
+    <div id="endScreen" class="end-screen hidden">
+
+        <h2 id="endMessage"></h2> 
+
+        <button id="endResetButton" class="hidden">Play Again</button>
+
+    </div>
+
+
+
+    <!-- TUTORIAL MODAL (Hidden by default) -->
+
+    <div id="tutorialModal" class="modal hidden">
+
+        <div class="modal-content">
+
+            <button class="close-btn" id="closeTutorialBtn">&times;</button>
+
+            <h2>How to Play Backbomb</h2>
+
+
+
+            <div class="carousel-container">
+
+                <div class="carousel-slide active" data-slide="0">
+
+                    <!-- Images were kept exactly as you provided them -->
+
+                    <img src="tutorial1.png" alt="Tutorial Image 1" onerror="this.onerror=null; this.src='https://placehold.co/250x150/548FF7/ffffff?text=1.+Find+Diamond';">
+
+                    <p><strong>Step 1: Find the Diamonds (💎).</strong> Click a tile that is not adjacent to a mine to find a diamond and increase your money by $1.</p>
+
+                </div>
+
+                <div class="carousel-slide" data-slide="1">
+
+                    <img src="tutorial2.png" alt="Tutorial Image 2" onerror="this.onerror=null; this.src='https://placehold.co/250x150/FCEA47/000000?text=2.+Avoid+Adjacent';">
+
+                    <p><strong>Step 2: Avoid Adjacent Tiles (🟡).</strong> Tiles colored yellow after a click are adjacent to a bomb. They are safe but contain no diamond. Treat them as warnings!</p>
+
+                </div>
+
+                <div class="carousel-slide" data-slide="2">
+
+                    <img src="tutorial3.png" alt="Tutorial Image 3" onerror="this.onerror=null; this.src='https://placehold.co/250x150/FF0000/ffffff?text=3.+Dodge+Bomb';">
+
+                    <p><strong>Step 3: Dodge the Bomb (💣).</strong> If you click a bomb, you lose half your current money and the board resets. Lose all your money and it's Game Over!</p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="carousel-nav">
+
+                <!-- prevBtn is disabled in HTML, correctly enabled via JS after first click -->
+
+                <button class="carousel-btn" id="prevBtn" disabled>Previous</button>
+
+                <div class="dots" id="carouselDots">
+
+                    <span class="dot active" data-dot="0"></span>
+
+                    <span class="dot" data-dot="1"></span>
+
+                    <span class="dot" data-dot="2"></span>
+
+                </div>
+
+                <!-- nextBtn is NOT disabled in HTML, correctly enabled until last slide -->
+
+                <button class="carousel-btn" id="nextBtn">Next</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    
+
+    <!-- CONFETTI CANVAS -->
+
+    <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1002;"></canvas>
+
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+
+
+    <script>
+
+        // Use 'let' for dynamic game settings
+
+        let gridSize = 7;
+
+        let mineCount = 5;
+
+        let selectedDifficulty = 'medium';
+
+
+
+        let balance = 0;
+
+        let mineIndices = [];
+
+        let revealedCells = 0;
+
+        let gameEnded = false;
+
+        let hitMine = false;
+
+        let firstClick = true; 
+
+        
+
+        // Carousel State
+
+        let currentSlide = 0;
+
+        const totalSlides = 3;
+
+
+
+        const myCanvas = document.getElementById('confetti-canvas');
+
+        const myConfetti = confetti.create(myCanvas, {
+
+            resize: true,
+
+            useWorker: true
+
+        });
+
+
+
+        // Get references to the main content containers
+
+        const mainMenu = document.getElementById('mainMenu');
+
+        const gameContent = document.getElementById('gameContent');
+
+        const tutorialModal = document.getElementById('tutorialModal');
+
+        const endScreen = document.getElementById('endScreen');
+
+
+
+        // DIFFICULTY SETTINGS
+
+        const difficulties = {
+
+            'easy': { size: 5, mines: 2, label: 'Easy' },
+
+            'medium': { size: 7, mines: 5, label: 'Medium' },
+
+            'hard': { size: 8, mines: 7, label: 'Hard' }
+
+        };
+
+
+
+        // --- BLUR LOGIC ---
+
+        function applyBlur() {
+
+            // Check which main container is visible and apply the blur class
+
+            if (!mainMenu.classList.contains('hidden')) {
+
+                mainMenu.classList.add('blurred');
+
+            } else if (!gameContent.classList.contains('hidden')) {
+
+                gameContent.classList.add('blurred');
+
+            }
+
+        }
+
+
+
+        function removeBlur() {
+
+            mainMenu.classList.remove('blurred');
+
+            gameContent.classList.remove('blurred');
+
+        }
+
+
+
+        // --- CAROUSEL LOGIC ---
+
+
+
+        function updateCarousel(direction) {
+
+            let newSlide = currentSlide + direction;
+
+            
+
+            // Check bounds to ensure we don't go past the first or last slide
+
+            if (newSlide >= 0 && newSlide < totalSlides) {
+
+                currentSlide = newSlide;
+
+                showSlide(currentSlide);
+
+            }
+
+        }
+
+
+
+        function showSlide(index) {
+
+            const slides = document.querySelectorAll('.carousel-slide');
+
+            const dots = document.querySelectorAll('.dot');
+
+            const prevBtn = document.getElementById('prevBtn');
+
+            const nextBtn = document.getElementById('nextBtn');
+
+            
+
+            slides.forEach((slide, i) => {
+
+                slide.classList.toggle('active', i === index);
+
+            });
+
+            
+
+            dots.forEach((dot, i) => {
+
+                dot.classList.toggle('active', i === index);
+
+            });
+
+
+
+            // Set button disabled states based on the current slide index
+
+            prevBtn.disabled = index === 0;
+
+            nextBtn.disabled = index === totalSlides - 1;
+
+            
+
+            currentSlide = index;
+
+        }
+
+
+
+        function openTutorial() {
+
+            tutorialModal.classList.remove('hidden');
+
+            applyBlur(); // Apply blur when tutorial modal opens
+
+            currentSlide = 0;
+
+            showSlide(currentSlide);
+
+        }
+
+
+
+        function closeTutorial() {
+
+            tutorialModal.classList.add('hidden');
+
+            removeBlur(); // Remove blur when tutorial modal closes
+
+        }
+
+
+
+        // --- MENU LOGIC ---
+
+
+
+        function renderDifficultyButtons() {
+
+            const container = document.getElementById('difficultySelection');
+
+            container.innerHTML = '';
+
+            
+
+            Object.keys(difficulties).forEach(key => {
+
+                const btn = document.createElement('button');
+
+                btn.classList.add('difficulty-btn');
+
+                btn.innerText = difficulties[key].label;
+
+                btn.dataset.difficulty = key;
+
+                
+
+                btn.addEventListener('click', () => {
+
+                    selectDifficulty(key);
+
+                    startGame();
+
+                });
+
+                
+
+                container.appendChild(btn);
+
+            });
+
+        }
+
+
+
+        function selectDifficulty(key) {
+
+            selectedDifficulty = key;
+
+            gridSize = difficulties[key].size;
+
+            mineCount = difficulties[key].mines;
+
+        }
+
+        
+
+        function startGame() {
+
+            document.getElementById("grid").style.setProperty('--grid-columns', `repeat(${gridSize}, 1fr)`);
+
+            
+
+            mainMenu.classList.add('hidden');
+
+            gameContent.classList.remove('hidden');
+
+            document.getElementById('backToMenu').classList.remove('hidden'); // Show back button
+
+            
+
+            // Get the label for the currently selected difficulty
+
+            const difficultyLabel = difficulties[selectedDifficulty].label;
+
+            
+
+            // Update the description paragraph with the difficulty label
+
+            document.getElementById('gameDescription').innerText = `Difficulty: ${difficultyLabel} | Mines: ${mineCount}`;
+
+
+
+            resetGame(false); 
+
+        }
+
+
+
+        // --- GAME LOGIC ---
+
+
+
+        // Checks if a tile is adjacent to a bomb.
+
+        function isAdjacent(index) {
+
+            for (const bombIndex of mineIndices) {
+
+                const row = Math.floor(index / gridSize);
+
+                const col = index % gridSize;
+
+                const bombRow = Math.floor(bombIndex / gridSize);
+
+                const bombCol = bombIndex % gridSize;
+
+                
+
+                const rowDiff = Math.abs(row - bombRow);
+
+                const colDiff = Math.abs(col - bombCol);
+
+                
+
+                // If tile is next to a bomb (within 1 unit in both directions)
+
+                // Also check if the current tile is the bomb itself, but we only use this for 
+
+                // generating the "safe" yellow tiles, so this is okay.
+
+                if (rowDiff <= 1 && colDiff <= 1) {
+
+                    return true;
+
+                }
+
+            }
+
+            return false;
+
+        }
+
+        
+
+        // Places mines, excluding the first clicked tile
+
+        function initializeMines(excludeIndex = -1) { 
+
+            mineIndices = [];
+
+            const totalCells = gridSize * gridSize;
+
+            const possibleMineIndices = new Set();
+
+            
+
+            // 1. Fill Set with all possible indices, excluding the first clicked tile
+
+            for (let i = 0; i < totalCells; i++) {
+
+                if (i !== excludeIndex) {
+
+                    possibleMineIndices.add(i);
+
+                }
+
+            }
+
+        
+
+            // 2. Select 'mineCount' random indices from the Set
+
+            const indicesArray = Array.from(possibleMineIndices);
+
+            for (let i = 0; i < mineCount; i++) {
+
+                if (indicesArray.length === 0) break;
+
+                
+
+                const randomIndex = Math.floor(Math.random() * indicesArray.length);
+
+                const selectedIndex = indicesArray.splice(randomIndex, 1)[0]; // Remove and get element
+
+                mineIndices.push(selectedIndex);
+
+            }
+
+        }
+
+        
+
+        function createGrid() {
+
+            const grid = document.getElementById("grid");
+
+            grid.innerHTML = "";
+
+            for (let i = 0; i < gridSize * gridSize; i++) {
+
+                const cell = document.createElement("div");
+
+                cell.classList.add("cell");
+
+                cell.dataset.index = i;
+
+                cell.addEventListener("click", () => revealCell(i));
+
+                grid.appendChild(cell);
+
+            }
+
+        }
+
+
+
+        function revealBoardOnEnd() {
+
+            document.querySelectorAll(".cell").forEach(c => {
+
+                const cIndex = parseInt(c.dataset.index);
+
+                // No need to recalculate isTileAdjacent if it's not used immediately.
+
+
+
+                if (mineIndices.includes(cIndex)) {
+
+                    // Reveal mines
+
+                    c.classList.add("mine");
+
+                    c.innerHTML = "💣";
+
+                    c.style.transform = "rotateY(180deg)";
+
+                } else if (isAdjacent(cIndex) && !c.classList.contains("revealed")) {
+
+                    // Reveal adjacent safe tiles (yellow) if they haven't been revealed as a diamond
+
+                    c.classList.add("safe");
+
+                    c.innerHTML = "";
+
+                    c.style.transform = "rotateY(180deg)"; 
+
+                }
+
+            });
+
+        }
+
+        
+
+        function revealCell(index) {
+
+            if (gameEnded) return;
+
+        
+
+            // Delay mine placement until the first click is made
+
+            if (firstClick) {
+
+                initializeMines(index);
+
+                firstClick = false;
+
+            }
+
+        
+
+            const cell = document.querySelector(`.cell[data-index='${index}']`);
+
+            if (!cell || cell.classList.contains("revealed") || cell.classList.contains("safe")) return;
+
+        
+
+            cell.style.transform = "rotateY(180deg)"; //Flip animation
+
+        
+
+            const isMine = mineIndices.includes(index); // Check against the mine array
+
+        
+
+            if (isMine) {
+
+                // Case 1: Hit the Bomb 💣
+
+                
+
+                // Call function to reveal the board on loss
+
+                revealBoardOnEnd();
+
+        
+
+                if (balance >= 2) {
+
+                    balance = Math.floor(balance / 2);
+
+                } else {
+
+                    balance = 0;
+
+                }
+
+                
+
+                document.getElementById("status").innerText = `You clicked a bomb! Money: $${balance}`;
+
+                hitMine = true;
+
+                freezeBoard();
+
+                
+
+                checkEndGame(); 
+
+                
+
+                if (gameEnded === false) { 
+
+                    showResetButton(); // Show restart board option if player still has money
+
+                }
+
+            } else if (isAdjacent(index)) {
+
+                // Case 2: Hit a Safe/Adjacent Tile (Yellow, no diamond)
+
+                cell.classList.add("safe");
+
+                cell.innerHTML = "";
+
+                document.getElementById("status").innerText = `Money: $${balance}`;
+
+            } else {
+
+                // Case 3: Hit a Diamond Tile 💎 (Only if not adjacent to a mine)
+
+                cell.classList.add("revealed");
+
+                cell.innerHTML = "💎";
+
+                revealedCells++;
+
+                balance += 1;
+
+                document.getElementById("status").innerText = `Money: $${balance}`;
+
+                checkVictory();
+
+            }
+
+        }
+
+        
+
+        function freezeBoard() {
+
+            document.querySelectorAll(".cell").forEach(cell => cell.style.pointerEvents = "none");
+
+        }
+
+        
+
+        function checkVictory() {
+
+            let totalDiamondTiles = 0;
+
+            const totalCells = gridSize * gridSize;
+
+            
+
+            // Loop through all cells to find the count of true diamond tiles 
+
+            for (let i = 0; i < totalCells; i++) {
+
+                if (!mineIndices.includes(i) && !isAdjacent(i)) {
+
+                    totalDiamondTiles++;
+
+                }
+
+            }
+
+            
+
+            // Check if the number of revealed green diamond tiles matches the required count
+
+            if (revealedCells === totalDiamondTiles) {
+
+                document.getElementById("endMessage").innerText = `VICTORY! You found all the gems and won $${balance}!`;
+
+                endScreen.classList.remove("hidden");
+
+                gameEnded = true;
+
+                showEndResetButton();
+
+                freezeBoard();
+
+                
+
+                // Call function to reveal the board on win
+
+                revealBoardOnEnd();
+
+        
+
+                myConfetti({
+
+                    particleCount: 150,
+
+                    spread: 120,
+
+                    origin: { y: 0.6 }
+
+                });
+
+
+
+                applyBlur(); // Apply blur when victory screen is shown
+
+            }
+
+        }
+
+        
+
+        function checkEndGame() {
+
+            if (balance <= 0 && hitMine) {
+
+                document.getElementById("endMessage").innerText = "Game Over! You lost ALL your money.";
+
+                endScreen.classList.remove("hidden");
+
+                gameEnded = true;
+
+                showEndResetButton();
+
+                freezeBoard();
+
+                applyBlur(); // Apply blur when game over screen is shown
+
+            }
+
+        }
+
+        
+
+        function showResetButton() {
+
+            // Shows the "Restart Board" button if a mine was hit but the player still has money
+
+            if (hitMine && gameEnded == false) {
+
+                document.getElementById("resetContainer").style.display = "block";
+
+            }
+
+        }
+
+        
+
+        function showEndResetButton() {
+
+            // Shows the "Play Again" button if the game is fully over (Win or zero cash loss)
+
+            if (gameEnded) {
+
+                document.getElementById("endResetButton").classList.remove("hidden");
+
+                document.getElementById("resetContainer").style.display = "none";
+
+            }
+
+        }
+
+        
+
+        function resetGame(returnToMenu = true) {
+
+            // Reset core game state
+
+            revealedCells = 0;
+
+            if (returnToMenu) {
+
+                balance = 0; // Only reset balance if returning to the main menu
+
+            }
+
+            gameEnded = false;
+
+            hitMine = false; 
+
+            firstClick = true; 
+
+            mineIndices = []; 
+
+            
+
+            // Reset UI elements
+
+            document.getElementById("status").innerText = `Money: $${balance}`;
+
+            endScreen.classList.add("hidden");
+
+            document.getElementById("resetContainer").style.display = "none";
+
+            document.getElementById("endResetButton").classList.add("hidden"); 
+
+            document.querySelectorAll(".cell").forEach(cell => cell.style.pointerEvents = "auto");
+
+            if (typeof myConfetti === 'function') { myConfetti.reset(); }
+
+
+
+            removeBlur(); // Always remove blur on reset
+
+            
+
+            // Go back to menu or restart game
+
+            if (returnToMenu) {
+
+                gameContent.classList.add('hidden');
+
+                mainMenu.classList.remove('hidden');
+
+                document.getElementById('backToMenu').classList.add('hidden'); // Hide back button
+
+            } else {
+
+                createGrid();
+
+            }
+
+        }
+
+        
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+
+            // Event Listeners for Game
+
+            document.getElementById("resetButton").addEventListener("click", () => {
+
+                resetGame(false);
+
+                startGame();
+
+            });
+
+            document.getElementById("endResetButton").addEventListener("click", () => {
+
+                resetGame(true); 
+
+            });
+
+            document.getElementById("backToMenu").addEventListener("click", () => resetGame(true)); 
+
+
+
+            // Event Listeners for Tutorial Modal
+
+            document.getElementById("howToPlayBtn").addEventListener("click", openTutorial);
+
+            document.getElementById("closeTutorialBtn").addEventListener("click", closeTutorial);
+
+            document.getElementById("prevBtn").addEventListener("click", () => updateCarousel(-1));
+
+            // The Next button click handler was already correct, verifying it is attached here:
+
+            document.getElementById("nextBtn").addEventListener("click", () => updateCarousel(1));
+
+            
+
+            // Initial Menu Setup
+
+            renderDifficultyButtons();
+
+            showSlide(currentSlide); // Initialize carousel display
+
+        });
+
+    </script>
+
 </body>
+
 </html>
