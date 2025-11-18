@@ -28,7 +28,7 @@
 
         h1 { 
             font-size: clamp(2.5rem, 5vw, 3rem);
-            color: #02112b; /* Adjusted color style to be valid */
+            color: #02112b;
             margin-bottom: 0.5rem;
         } 
         p { 
@@ -307,7 +307,7 @@
             height: auto;
             border-radius: 6px;
             margin-bottom: 15px;
-            box-shadow: none; /* REMOVED SHADOW */
+            box-shadow: none;
         }
 
         .carousel-nav {
@@ -325,13 +325,22 @@
             font-weight: bold;
             transition: 0.2s;
         }
+        
+        /* FIX: Increased hover contrast and added subtle movement for feedback */
+        .carousel-btn:hover:not(:disabled) {
+            background: #041f7a;
+            transform: translateY(-1px); 
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Ensure disabled state is visually clear and non-interactive */
         .carousel-btn:disabled {
             background: #ccc;
             cursor: default;
+            transform: none; /* Override hover transform if disabled */
+            box-shadow: none;
         }
-        .carousel-btn:hover:not(:disabled) {
-            background: #041f7a;
-        }
+        
         .dots {
             margin: 0 10px;
             display: flex;
@@ -401,26 +410,28 @@
 
             <div class="carousel-container">
                 <div class="carousel-slide active" data-slide="0">
-                    <img src="tutorial1.png" alt="Tutorial Image 1">
+                    <img src="tutorial1.png" alt="Tutorial Image 1" onerror="this.onerror=null; this.src='https://placehold.co/250x150/548FF7/ffffff?text=1.+Find+Diamond';">
                     <p><strong>Step 1: Find the Diamonds (💎).</strong> Click a tile that is not adjacent to a mine to find a diamond and increase your money by $1.</p>
                 </div>
                 <div class="carousel-slide" data-slide="1">
-                    <img src="tutorial2.png" alt="Tutorial Image 2">
+                    <img src="tutorial2.png" alt="Tutorial Image 2" onerror="this.onerror=null; this.src='https://placehold.co/250x150/FCEA47/000000?text=2.+Avoid+Adjacent';">
                     <p><strong>Step 2: Avoid Adjacent Tiles (🟡).</strong> Tiles colored yellow after a click are adjacent to a bomb. They are safe but contain no diamond. Treat them as warnings!</p>
                 </div>
                 <div class="carousel-slide" data-slide="2">
-                    <img src="tutorial3.png" alt="Tutorial Image 3">
+                    <img src="tutorial3.png" alt="Tutorial Image 3" onerror="this.onerror=null; this.src='https://placehold.co/250x150/FF0000/ffffff?text=3.+Dodge+Bomb';">
                     <p><strong>Step 3: Dodge the Bomb (💣).</strong> If you click a bomb, you lose half your current money and the board resets. Lose all your money and it's Game Over!</p>
                 </div>
             </div>
 
             <div class="carousel-nav">
+                <!-- prevBtn is disabled in HTML, correctly enabled via JS after first click -->
                 <button class="carousel-btn" id="prevBtn" disabled>Previous</button>
                 <div class="dots" id="carouselDots">
                     <span class="dot active" data-dot="0"></span>
                     <span class="dot" data-dot="1"></span>
                     <span class="dot" data-dot="2"></span>
                 </div>
+                <!-- nextBtn is NOT disabled in HTML, correctly enabled until last slide -->
                 <button class="carousel-btn" id="nextBtn">Next</button>
             </div>
         </div>
@@ -467,7 +478,7 @@
             'hard': { size: 8, mines: 7, label: 'Hard' }
         };
 
-        // --- BLUR LOGIC (NEW) ---
+        // --- BLUR LOGIC ---
         function applyBlur() {
             // Check which main container is visible and apply the blur class
             if (!mainMenu.classList.contains('hidden')) {
@@ -584,6 +595,8 @@
                 const colDiff = Math.abs(col - bombCol);
                 
                 // If tile is next to a bomb (within 1 unit in both directions)
+                // Also check if the current tile is the bomb itself, but we only use this for 
+                // generating the "safe" yellow tiles, so this is okay.
                 if (rowDiff <= 1 && colDiff <= 1) {
                     return true;
                 }
@@ -807,6 +820,7 @@
             document.getElementById("howToPlayBtn").addEventListener("click", openTutorial);
             document.getElementById("closeTutorialBtn").addEventListener("click", closeTutorial);
             document.getElementById("prevBtn").addEventListener("click", () => updateCarousel(-1));
+            // The Next button click handler was already correct, verifying it is attached here:
             document.getElementById("nextBtn").addEventListener("click", () => updateCarousel(1));
             
             // Initial Menu Setup
