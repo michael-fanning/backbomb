@@ -436,7 +436,6 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <script>
-        // Use 'let' for dynamic game settings
         let gridSize = 7;
         let mineCount = 5;
         let selectedDifficulty = 'medium';
@@ -586,10 +585,6 @@
 
                 const rowDiff = Math.abs(row - bombRow);
                 const colDiff = Math.abs(col - bombCol);
-
-                // If tile is next to a bomb (within 1 unit in both directions)
-                // Also check if the current tile is the bomb itself, but we only use this for
-                // generating the "safe" yellow tiles, so this is okay.
                 if (rowDiff <= 1 && colDiff <= 1) {
                     return true;
                 }
@@ -628,7 +623,10 @@
                 const cell = document.createElement("div");
                 cell.classList.add("cell");
                 cell.dataset.index = i;
-                cell.addEventListener("click", () => revealCell(i));
+                cell.addEventListener("click", (event) => {
+                    event.preventDefault(); // Prevents the element from being focused
+                    revealCell(i);
+                });
                 grid.appendChild(cell);
             }
         }
@@ -669,9 +667,6 @@
             const isMine = mineIndices.includes(index); // Check against the mine array
 
             if (isMine) {
-                // Case 1: Hit the Bomb 💣
-
-                // Call function to reveal the board on loss
                 revealBoardOnEnd();
 
                 if (balance >= 2) {
@@ -690,12 +685,10 @@
                     showResetButton(); // Show restart board option if player still has money
                 }
             } else if (isAdjacent(index)) {
-                // Case 2: Hit a Safe/Adjacent Tile (Yellow, no diamond)
                 cell.classList.add("safe");
                 cell.innerHTML = "";
                 document.getElementById("status").innerText = `Money: $${balance}`;
             } else {
-                // Case 3: Hit a Diamond Tile 💎 (Only if not adjacent to a mine)
                 cell.classList.add("revealed");
                 cell.innerHTML = "💎";
                 revealedCells++;
@@ -720,7 +713,6 @@
                 }
             }
 
-            // Check if the number of revealed green diamond tiles matches the required count
             if (revealedCells === totalDiamondTiles) {
                 document.getElementById("endMessage").innerText = `VICTORY! You found all the gems and won $${balance}!`;
                 endScreen.classList.remove("hidden");
@@ -728,7 +720,6 @@
                 showEndResetButton();
                 freezeBoard();
 
-                // Call function to reveal the board on win
                 revealBoardOnEnd();
 
                 myConfetti({
@@ -737,7 +728,7 @@
                     origin: { y: 0.6 }
                 });
 
-                applyBlur(); // Apply blur when victory screen is shown
+                applyBlur();
             }
         }
 
