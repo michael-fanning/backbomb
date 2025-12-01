@@ -278,6 +278,15 @@
         }
         .close-btn:hover { color: #010E26; }
 
+        .image-wrapper {
+            height: 150px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
         .carousel-container {
             position: relative;
             margin-top: 20px;
@@ -406,15 +415,15 @@
 
             <div class="carousel-container">
                 <div class="carousel-slide active" data-slide="0">
-                    <img src="tutorial1.png" alt="Tutorial Image 1" onerror="this.onerror=null; this.src='https://placehold.co/250x150/548FF7/ffffff?text=1.+Find+Diamond';">
+                    <div class="image-wrapper"> <img src="tutorial1.png" alt="Tutorial Image 1" onerror="this.onerror=null; this.src='https://placehold.co/250x150/548FF7/ffffff?text=1.+Find+Diamond';"> </div>
                     <p><strong>Step 1: Find the Diamonds (💎).</strong> Click a tile that is not adjacent to a mine to find a diamond and increase your money by $1.</p>
                 </div>
                 <div class="carousel-slide" data-slide="1">
-                    <img src="tutorial2.png" alt="Tutorial Image 2" onerror="this.onerror=null; this.src='https://placehold.co/250x150/FCEA47/000000?text=2.+Avoid+Adjacent';">
+                    <div class="image-wrapper"> <img src="tutorial2.png" alt="Tutorial Image 2" onerror="this.onerror=null; this.src='https://placehold.co/250x150/FCEA47/000000?text=2.+Avoid+Adjacent';"> </div>
                     <p><strong>Step 2: Avoid Adjacent Tiles (🟡).</strong> Tiles colored yellow after a click are adjacent to a bomb. They are safe but contain no diamond. Treat them as warnings!</p>
                 </div>
                 <div class="carousel-slide" data-slide="2">
-                    <img src="tutorial3.png" alt="Tutorial Image 3" onerror="this.onerror=null; this.src='https://placehold.co/250x150/FF0000/ffffff?text=3.+Dodge+Bomb';">
+                    <div class="image-wrapper"> <img src="tutorial3.png" alt="Tutorial Image 3" onerror="this.onerror=null; this.src='https://placehold.co/250x150/FF0000/ffffff?text=3.+Dodge+Bomb';"> </div>
                     <p><strong>Step 3: Dodge the Bomb (💣).</strong> If you click a bomb, you lose half your current money and the board resets. Lose all your money and it's Game Over!</p>
                 </div>
             </div>
