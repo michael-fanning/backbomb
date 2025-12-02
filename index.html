@@ -500,42 +500,42 @@
     <canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1002;"></canvas>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
+    
     <script>
         let gridSize = 7;
         let mineCount = 5;
         let selectedDifficulty = 'medium';
-
+    
         let balance = 0;
         let mineIndices = [];
         let revealedCells = 0;
         let gameEnded = false;
         let hitMine = false;
         let firstClick = true;
-
+    
         // Carousel State
         let currentSlide = 0;
         const totalSlides = 3;
-
+    
         const myCanvas = document.getElementById('confetti-canvas');
         const myConfetti = confetti.create(myCanvas, {
             resize: true,
             useWorker: true
         });
-
+    
         // Get references to the main content containers
         const mainMenu = document.getElementById('mainMenu');
         const gameContent = document.getElementById('gameContent');
         const tutorialModal = document.getElementById('tutorialModal');
         const endScreen = document.getElementById('endScreen');
-
+    
         // DIFFICULTY SETTINGS
         const difficulties = {
             'easy': { size: 5, mines: 2, label: 'Easy' },
             'medium': { size: 7, mines: 5, label: 'Medium' },
             'hard': { size: 8, mines: 7, label: 'Hard' }
         };
-
+    
         // --- BLUR LOGIC ---
         function applyBlur() {
             // Check which main container is visible and apply the blur class
@@ -545,102 +545,102 @@
                 gameContent.classList.add('blurred');
             }
         }
-
+    
         function removeBlur() {
             mainMenu.classList.remove('blurred');
             gameContent.classList.remove('blurred');
         }
-
+    
         // --- CAROUSEL LOGIC ---
-
+    
         function updateCarousel(direction) {
             let newSlide = currentSlide + direction;
-
+    
             // Check bounds to ensure we don't go past the first or last slide
             if (newSlide >= 0 && newSlide < totalSlides) {
                 currentSlide = newSlide;
                 showSlide(currentSlide);
             }
         }
-
+    
         function showSlide(index) {
             const slides = document.querySelectorAll('.carousel-slide');
             const dots = document.querySelectorAll('.dot');
             const prevBtn = document.getElementById('prevBtn');
             const nextBtn = document.getElementById('nextBtn');
-
+    
             slides.forEach((slide, i) => {
                 slide.classList.toggle('active', i === index);
             });
-
+    
             dots.forEach((dot, i) => {
                 dot.classList.toggle('active', i === index);
             });
-
+    
             // Set button disabled states based on the current slide index
             prevBtn.disabled = index === 0;
             nextBtn.disabled = index === totalSlides - 1;
-
+    
             currentSlide = index;
         }
-
+    
         function openTutorial() {
             tutorialModal.classList.remove('hidden');
             applyBlur(); // Apply blur when tutorial modal opens
             currentSlide = 0;
             showSlide(currentSlide);
         }
-
+    
         function closeTutorial() {
             tutorialModal.classList.add('hidden');
             removeBlur(); // Remove blur when tutorial modal closes
         }
-
+    
         // --- MENU LOGIC ---
-
+    
         function renderDifficultyButtons() {
             const container = document.getElementById('difficultySelection');
             container.innerHTML = '';
-
+    
             Object.keys(difficulties).forEach(key => {
                 const btn = document.createElement('button');
                 btn.classList.add('difficulty-btn');
                 btn.innerText = difficulties[key].label;
                 btn.dataset.difficulty = key;
-
+    
                 btn.addEventListener('click', () => {
                     selectDifficulty(key);
                     startGame();
                 });
-
+    
                 container.appendChild(btn);
             });
         }
-
+    
         function selectDifficulty(key) {
             selectedDifficulty = key;
             gridSize = difficulties[key].size;
             mineCount = difficulties[key].mines;
         }
-
+    
         function startGame() {
             document.getElementById("grid").style.setProperty('--grid-columns', `repeat(${gridSize}, 1fr)`);
-
+    
             mainMenu.classList.add('hidden');
             gameContent.classList.remove('hidden');
             document.getElementById('backToMenu').classList.remove('hidden'); // Show back button
-
+    
             // Get the label for the currently selected difficulty
             const difficultyLabel = difficulties[selectedDifficulty].label;
-
+    
             // Update the description paragraph with the difficulty label
             document.getElementById('gameDescription').innerText = `Difficulty: ${difficultyLabel} | Mines: ${mineCount}`;
-
-            resetGame(false);
+    
+            resetBoardState(false);
         }
-
+    
         // --- GAME LOGIC ---
-
+    
         // Checks if a tile is adjacent to a bomb.
         function isAdjacent(index) {
             for (const bombIndex of mineIndices) {
@@ -648,7 +648,7 @@
                 const col = index % gridSize;
                 const bombRow = Math.floor(bombIndex / gridSize);
                 const bombCol = bombIndex % gridSize;
-
+    
                 const rowDiff = Math.abs(row - bombRow);
                 const colDiff = Math.abs(col - bombCol);
                 if (rowDiff <= 1 && colDiff <= 1) {
@@ -657,31 +657,31 @@
             }
             return false;
         }
-
+    
         // Places mines, excluding the first clicked tile
         function initializeMines(excludeIndex = -1) {
             mineIndices = [];
             const totalCells = gridSize * gridSize;
             const possibleMineIndices = new Set();
-
+    
             // 1. Fill Set with all possible indices, excluding the first clicked tile
             for (let i = 0; i < totalCells; i++) {
                 if (i !== excludeIndex) {
                     possibleMineIndices.add(i);
                 }
             }
-
+    
             // 2. Select 'mineCount' random indices from the Set
             const indicesArray = Array.from(possibleMineIndices);
             for (let i = 0; i < mineCount; i++) {
                 if (indicesArray.length === 0) break;
-
+    
                 const randomIndex = Math.floor(Math.random() * indicesArray.length);
                 const selectedIndex = indicesArray.splice(randomIndex, 1)[0]; // Remove and get element
                 mineIndices.push(selectedIndex);
             }
         }
-
+    
         function createGrid() {
             const grid = document.getElementById("grid");
             grid.innerHTML = "";
@@ -690,18 +690,18 @@
                 cell.classList.add("cell");
                 cell.dataset.index = i;
                 cell.addEventListener("click", (event) => {
-                    event.preventDefault(); // Prevents the element from being focused
-                    revealCell(i);
-                });
+                    event.preventDefault(); // Prevents the element from being focused
+                    revealCell(i);
+                });
                 grid.appendChild(cell);
             }
         }
-
+    
         function revealBoardOnEnd() {
             document.querySelectorAll(".cell").forEach(c => {
                 const cIndex = parseInt(c.dataset.index);
                 // No need to recalculate isTileAdjacent if it's not used immediately.
-
+    
                 if (mineIndices.includes(cIndex)) {
                     // Reveal mines
                     c.classList.add("mine");
@@ -715,38 +715,38 @@
                 }
             });
         }
-
+    
         function revealCell(index) {
             if (gameEnded) return;
-
+    
             // Delay mine placement until the first click is made
             if (firstClick) {
                 initializeMines(index);
                 firstClick = false;
             }
-
+    
             const cell = document.querySelector(`.cell[data-index='${index}']`);
             if (!cell || cell.classList.contains("revealed") || cell.classList.contains("safe")) return;
-
+    
             cell.style.transform = "rotateY(180deg)"; //Flip animation
-
+    
             const isMine = mineIndices.includes(index); // Check against the mine array
-
+    
             if (isMine) {
                 revealBoardOnEnd();
-
+    
                 if (balance >= 2) {
                     balance = Math.floor(balance / 2);
                 } else {
                     balance = 0;
                 }
-
+    
                 document.getElementById("status").innerText = `You clicked a bomb! Money: $${balance}`;
                 hitMine = true;
                 freezeBoard();
-
+    
                 checkEndGame();
-
+    
                 if (gameEnded === false) {
                     showResetButton(); // Show restart board option if player still has money
                 }
@@ -763,41 +763,41 @@
                 checkVictory();
             }
         }
-
+    
         function freezeBoard() {
             document.querySelectorAll(".cell").forEach(cell => cell.style.pointerEvents = "none");
         }
-
+    
         function checkVictory() {
             let totalDiamondTiles = 0;
             const totalCells = gridSize * gridSize;
-
+    
             // Loop through all cells to find the count of true diamond tiles
             for (let i = 0; i < totalCells; i++) {
                 if (!mineIndices.includes(i) && !isAdjacent(i)) {
                     totalDiamondTiles++;
                 }
             }
-
+    
             if (revealedCells === totalDiamondTiles) {
                 document.getElementById("endMessage").innerText = `VICTORY! You found all the gems and won $${balance}!`;
                 endScreen.classList.remove("hidden");
                 gameEnded = true;
                 showEndResetButton();
                 freezeBoard();
-
+    
                 revealBoardOnEnd();
-
+    
                 myConfetti({
                     particleCount: 150,
                     spread: 120,
                     origin: { y: 0.6 }
                 });
-
+    
                 applyBlur();
             }
         }
-
+    
         function checkEndGame() {
             if (balance <= 0 && hitMine) {
                 document.getElementById("endMessage").innerText = "Game Over! You lost ALL your money.";
@@ -808,14 +808,14 @@
                 applyBlur(); // Apply blur when game over screen is shown
             }
         }
-
+    
         function showResetButton() {
             // Shows the "Restart Board" button if a mine was hit but the player still has money
             if (hitMine && gameEnded == false) {
                 document.getElementById("resetContainer").style.display = "block";
             }
         }
-
+    
         function showEndResetButton() {
             // Shows the "Play Again" button if the game is fully over (Win or zero cash loss)
             if (gameEnded) {
@@ -823,18 +823,16 @@
                 document.getElementById("resetContainer").style.display = "none";
             }
         }
-
-        function resetGame(returnToMenu = true) {
-            // Reset core game state
+    
+        // Renamed and refactored the reset function for clarity and correct logic
+        function resetBoardState(goToMenu = true) { 
+            // Reset core game board state for a new round
             revealedCells = 0;
-            if (returnToMenu) {
-                balance = 0; // Only reset balance if returning to the main menu
-            }
             gameEnded = false;
             hitMine = false;
             firstClick = true;
             mineIndices = [];
-
+    
             // Reset UI elements
             document.getElementById("status").innerText = `Money: $${balance}`;
             endScreen.classList.add("hidden");
@@ -842,37 +840,48 @@
             document.getElementById("endResetButton").classList.add("hidden");
             document.querySelectorAll(".cell").forEach(cell => cell.style.pointerEvents = "auto");
             if (typeof myConfetti === 'function') { myConfetti.reset(); }
-
+    
             removeBlur(); // Always remove blur on reset
-
+    
             // Go back to menu or restart game
-            if (returnToMenu) {
+            if (goToMenu) {
+                balance = 0; // Only reset balance if returning to the main menu
                 gameContent.classList.add('hidden');
                 mainMenu.classList.remove('hidden');
                 document.getElementById('backToMenu').classList.add('hidden'); // Hide back button
             } else {
-                createGrid();
+                // This is where a game restart without going to the menu happens
+                createGrid(); 
             }
         }
-
+    
         document.addEventListener('DOMContentLoaded', (event) => {
             // Event Listeners for Game
+            // This is for the "Restart Board" button after hitting a mine but having money left
             document.getElementById("resetButton").addEventListener("click", () => {
-                resetGame(false);
+                // Call reset to clear the board state, then startGame to redraw with current difficulty
+                resetBoardState(false); 
                 startGame();
             });
+            
+            // This is for the "Play Again" button after Game Over/Victory
             document.getElementById("endResetButton").addEventListener("click", () => {
-                resetGame(true);
+                // Call resetBoardState to clear the end screen/board, but DONT go to menu (false)
+                resetBoardState(false); 
+                // Restart the game using the current (and unchanged) difficulty settings
+                startGame();
             });
-            document.getElementById("backToMenu").addEventListener("click", () => resetGame(true));
-
+    
+            // The back button should always return to menu and reset balance
+            document.getElementById("backToMenu").addEventListener("click", () => resetBoardState(true)); 
+    
             // Event Listeners for Tutorial Modal
             document.getElementById("howToPlayBtn").addEventListener("click", openTutorial);
             document.getElementById("closeTutorialBtn").addEventListener("click", closeTutorial);
             document.getElementById("prevBtn").addEventListener("click", () => updateCarousel(-1));
             // The Next button click handler was already correct, verifying it is attached here:
             document.getElementById("nextBtn").addEventListener("click", () => updateCarousel(1));
-
+    
             // Initial Menu Setup
             renderDifficultyButtons();
             showSlide(currentSlide); // Initialize carousel display
