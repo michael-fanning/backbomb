@@ -179,60 +179,8 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-       /* --- Main Menu Styling --- */
-        #mainMenu {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: white;
-            padding: 40px 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 100%;
-        }
-
-        .menu-description {
-            font-size: 18px;
-            margin-bottom: 30px;
-            color: #444;
-        }
-
-        #difficultySelection {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .difficulty-btn, #howToPlayBtn {
-            padding: 15px 25px; /* Slightly larger buttons since they are the main action */
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            background: #99BFFF;
-            color: #010E26;
-            border: 2px solid transparent;
-            border-radius: 8px;
-            transition: 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            flex-grow: 1;
-            min-width: 120px;
-            margin-top: 10px; /* Separator for How To Play button */
-        }
-
-        .difficulty-btn:hover, #howToPlayBtn:hover {
-            background: #548FF7;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        /* --- End Screen Styling --- */
-        .end-screen {
+       /* --- End Screen Styling --- */
+       .end-screen {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6); /* FIX: Reduced opacity from 0.9 to 0.6 */
@@ -257,7 +205,35 @@
             text-align: center;
         }
 
-        /* Buttons */
+        /* Buttons Container for Play Again and Main Menu */
+        #endButtonContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            z-index: 1001; /* Ensure buttons are above background blur */
+        }
+
+        /* Styles for buttons within End Screen */
+        .end-screen-button {
+            padding: 20px 40px;
+            font-size: 24px;
+            cursor: pointer;
+            background: #99BFFF;
+            color: #010E26;
+            border: 4px solid #548FF7;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: 0.3s ease;
+        }
+
+        .end-screen-button:hover {
+            background: #548FF7;
+            color: white;
+        }
+
+        /* Styles for the regular restart button during game */
         #resetContainer {
             display: none;
             margin-top: 20px;
@@ -274,24 +250,6 @@
         }
         #resetButton:hover { background: #548FF7; }
 
-        #endResetButton {
-            padding: 20px 40px;
-            font-size: 24px;
-            cursor: pointer;
-            background: #99BFFF;
-            color: #010E26;
-            border: 4px solid #548FF7;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: 0.3s ease;
-            margin-bottom: 30px;
-            z-index: 1001;
-        }
-
-        #endResetButton:hover {
-            background: #548FF7;
-            color: white;
-        }
 
         /* --- Tutorial Modal/Carousel Styling --- */
         .modal {
@@ -331,7 +289,7 @@
         .close-btn:hover { color: #010E26; }
 
         .image-wrapper {
-            height: 150px; 
+            height: 150px; 
             width: 100%;
             display: flex;
             align-items: center;
@@ -462,7 +420,10 @@
 
     <div id="endScreen" class="end-screen hidden">
         <h2 id="endMessage"></h2>
-        <button id="endResetButton" class="hidden">Play Again</button>
+        <div id="endButtonContainer">
+            <button id="endResetButton" class="end-screen-button hidden">Play Again</button>
+            <button id="endMenuButton" class="end-screen-button hidden">Main Menu</button> 
+        </div>
     </div>
 
     <div id="tutorialModal" class="modal hidden">
@@ -817,9 +778,10 @@
         }
     
         function showEndResetButton() {
-            // Shows the "Play Again" button if the game is fully over (Win or zero cash loss)
+            // Shows the "Play Again" and "Main Menu" buttons if the game is fully over (Win or zero cash loss)
             if (gameEnded) {
                 document.getElementById("endResetButton").classList.remove("hidden");
+                document.getElementById("endMenuButton").classList.remove("hidden"); // **NEW**
                 document.getElementById("resetContainer").style.display = "none";
             }
         }
@@ -838,6 +800,7 @@
             endScreen.classList.add("hidden");
             document.getElementById("resetContainer").style.display = "none";
             document.getElementById("endResetButton").classList.add("hidden");
+            document.getElementById("endMenuButton").classList.add("hidden"); // **NEW**
             document.querySelectorAll(".cell").forEach(cell => cell.style.pointerEvents = "auto");
             if (typeof myConfetti === 'function') { myConfetti.reset(); }
     
@@ -846,6 +809,7 @@
             // Go back to menu or restart game
             if (goToMenu) {
                 balance = 0; // Only reset balance if returning to the main menu
+                document.getElementById("status").innerText = `Money: $${balance}`; // Update status after balance reset
                 gameContent.classList.add('hidden');
                 mainMenu.classList.remove('hidden');
                 document.getElementById('backToMenu').classList.add('hidden'); // Hide back button
@@ -870,6 +834,12 @@
                 resetBoardState(false); 
                 // Restart the game using the current (and unchanged) difficulty settings
                 startGame();
+            });
+
+            // **NEW** Event Listener for the "Main Menu" button on the end screen
+            document.getElementById("endMenuButton").addEventListener("click", () => {
+                // Call resetBoardState to clear the board and go back to the menu (true)
+                resetBoardState(true);
             });
     
             // The back button should always return to menu and reset balance
