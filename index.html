@@ -162,11 +162,9 @@
             margin-bottom: 30px;
             flex-wrap: wrap;
             justify-content: center;
-            /* Ensure the container takes full width of its parent */
-            width: 100%; 
         }
 
-        .difficulty-btn {
+        .difficulty-btn, #howToPlayBtn {
             padding: 15px 25px; /* Slightly larger buttons since they are the main action */
             font-size: 18px;
             font-weight: bold;
@@ -189,14 +187,6 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-
-        /* --- NEW STYLE FOR FULL SPANNING BUTTON --- */
-        #howToPlayBtn {
-            flex-basis: 100%; /* Force the button to take the full width of the container */
-            min-width: unset; /* Override the default minimum width */
-            margin-top: 5px; /* Ensure spacing below the other buttons */
-        }
-        /* --- END NEW STYLE --- */
 
        /* --- End Screen Styling --- */
        .end-screen {
@@ -419,9 +409,9 @@
         <h1>Backbomb</h1>
         <p class="menu-description">Click tiles to search for diamonds. Find a mine and lose!</p>
 
-        <div id="difficultySelection"> 
-                        <button id="howToPlayBtn" class="difficulty-btn">How to Play</button>
-        </div>
+        <div id="difficultySelection"> </div>
+
+        <button id="howToPlayBtn" class="difficulty-btn">How to Play</button>
 
     </div>
 
@@ -579,11 +569,6 @@
     
         function renderDifficultyButtons() {
             const container = document.getElementById('difficultySelection');
-            
-            // Find the 'How to Play' button that was placed in the HTML
-            const howToPlayBtn = document.getElementById('howToPlayBtn');
-            
-            // Clear existing content, ensuring 'How to Play' is preserved
             container.innerHTML = '';
     
             Object.keys(difficulties).forEach(key => {
@@ -599,9 +584,6 @@
     
                 container.appendChild(btn);
             });
-            
-            // Re-append the 'How to Play' button after the dynamically generated buttons
-            container.appendChild(howToPlayBtn);
         }
     
         function selectDifficulty(key) {
@@ -638,7 +620,6 @@
     
                 const rowDiff = Math.abs(row - bombRow);
                 const colDiff = Math.abs(col - bombCol);
-    
                 if (rowDiff <= 1 && colDiff <= 1) {
                     return true;
                 }
