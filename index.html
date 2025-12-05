@@ -15,7 +15,7 @@
             margin: 0;
             text-align: center;
             min-height: 100vh;
-            background-color: #E5EFFF; /*Light baby blue*/
+            background-color: #E5EFFF;
             color: #010E26;
             display: flex;
             flex-direction: column;
@@ -44,7 +44,6 @@
             margin-top: 0.1rem;
         }
 
-        /* Utility Class */
         .hidden {
             display: none !important;
         }
@@ -60,13 +59,13 @@
             position: fixed;
             top: 20px;
             left: 20px;
-            background: #041f7a; /* Navy blue square */
+            background: #041f7a;
             color: white;
             font-size: 30px;
             width: 40px;
             height: 40px;
             border: none;
-            border-radius: 8px; /* Rounded corners */
+            border-radius: 8px;
             cursor: pointer;
             line-height: 1;
             display: flex;
@@ -74,21 +73,19 @@
             justify-content: center;
             padding: 0;
             transition: background 0.2s ease, transform 0.1s;
-            z-index: 1003; /* Higher than confetti */
+            z-index: 1003;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         #backToMenu:hover {
-            background: #2c4494; /* Slightly lighter navy blue on hover */
+            background: #2c4494;
             transform: scale(1.05);
         }
 
-        /* --- Game Container Styling --- */
         #gameContent.hidden {
             display: none;
         }
 
-        /* Ensure H3 is styled nicely inside the game content */
         #gameContent h3 {
             font-size: 1.25rem;
             margin-bottom: 1.5rem;
@@ -117,16 +114,15 @@
             transition: transform 0.3s ease, background 0.3s ease;
             transform-style: preserve-3d;
         }
-        .cell:hover:not(.revealed):not(.safe) { background: #bbb; } /* Only hover if not revealed */
+        .cell:hover:not(.revealed):not(.safe) { background: #bbb; }
 
-        /* Revealed states */
         .cell.revealed {
             background: lightgreen;
             transform: rotateY(180deg);
             cursor: default;
         }
         .cell.safe {
-            background: #fcea47; /* Pale Yellow */
+            background: #fcea47;
             transform: rotateY(180deg);
             cursor: default;
         }
@@ -135,7 +131,6 @@
             transform: rotateY(180deg);
         }
 
-        /* --- Main Menu Styling --- */
         #mainMenu {
             display: flex;
             flex-direction: column;
@@ -196,11 +191,10 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        /* --- End Screen Styling --- */
         .end-screen {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6); /* FIX: Reduced opacity from 0.9 to 0.6 */
+            background: rgba(0, 0, 0, 0.6);
             color: white; display: flex;
             flex-direction: column; align-items: center;
             justify-content: center;
@@ -222,17 +216,15 @@
             text-align: center;
         }
 
-        /* Buttons Container for Play Again and Main Menu */
         #endButtonContainer {
             display: flex;
             flex-direction: column;
             gap: 15px;
             margin-top: 20px;
             margin-bottom: 30px;
-            z-index: 1001; /* Ensure buttons are above background blur */
+            z-index: 1001;
         }
 
-        /* Styles for buttons within End Screen */
         .end-screen-button {
             padding: 20px 40px;
             font-size: 24px;
@@ -250,7 +242,6 @@
             color: white;
         }
 
-        /* Styles for the regular restart button during game */
         #resetContainer {
             display: none;
             margin-top: 20px;
@@ -267,8 +258,6 @@
         }
         #resetButton:hover { background: #548FF7; }
 
-
-        /* --- Tutorial Modal/Carousel Styling --- */
         .modal {
             position: fixed;
             top: 0;
@@ -333,10 +322,9 @@
 
         .carousel-slide.active {
             opacity: 1;
-            position: relative; /* Bring active slide back to flow */
+            position: relative;
         }
-
-        /* CORRECTED & CONSOLIDATED IMAGE STYLES */
+        
         .carousel-slide img {
             max-height: 100%;
             max-width: 250px;
@@ -366,18 +354,16 @@
             z-index: 99999;
         }
 
-        /* FIX: Increased hover contrast and added subtle movement for feedback */
         .carousel-btn:hover:not(:disabled) {
             background: #041f7a;
             transform: translateY(-1px);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
-        /* Ensure disabled state is visually clear and non-interactive */
         .carousel-btn:disabled {
             background: #ccc;
             cursor: default;
-            transform: none; /* Override hover transform if disabled */
+            transform: none;
             box-shadow: none;
         }
 
@@ -489,7 +475,6 @@
         let hitMine = false;
         let firstClick = true;
 
-        // Carousel State
         let currentSlide = 0;
         const totalSlides = 3;
 
@@ -499,22 +484,18 @@
             useWorker: true
         });
 
-        // Get references to the main content containers
         const mainMenu = document.getElementById('mainMenu');
         const gameContent = document.getElementById('gameContent');
         const tutorialModal = document.getElementById('tutorialModal');
         const endScreen = document.getElementById('endScreen');
 
-        // DIFFICULTY SETTINGS
         const difficulties = {
             'easy': { size: 5, mines: 2, label: 'Easy' },
             'medium': { size: 7, mines: 5, label: 'Medium' },
             'hard': { size: 8, mines: 7, label: 'Hard' }
         };
 
-        // --- BLUR LOGIC ---
         function applyBlur() {
-            // Check which main container is visible and apply the blur class
             if (!mainMenu.classList.contains('hidden')) {
                 mainMenu.classList.add('blurred');
             } else if (!gameContent.classList.contains('hidden')) {
@@ -527,12 +508,9 @@
             gameContent.classList.remove('blurred');
         }
 
-        // --- CAROUSEL LOGIC ---
-
         function updateCarousel(direction) {
             let newSlide = currentSlide + direction;
 
-            // Check bounds to ensure we don't go past the first or last slide
             if (newSlide >= 0 && newSlide < totalSlides) {
                 currentSlide = newSlide;
                 showSlide(currentSlide);
@@ -553,7 +531,6 @@
                 dot.classList.toggle('active', i === index);
             });
 
-            // Set button disabled states based on the current slide index
             prevBtn.disabled = index === 0;
             nextBtn.disabled = index === totalSlides - 1;
 
@@ -562,17 +539,15 @@
 
         function openTutorial() {
             tutorialModal.classList.remove('hidden');
-            applyBlur(); // Apply blur when tutorial modal opens
+            applyBlur();
             currentSlide = 0;
             showSlide(currentSlide);
         }
 
         function closeTutorial() {
             tutorialModal.classList.add('hidden');
-            removeBlur(); // Remove blur when tutorial modal closes
+            removeBlur();
         }
-
-        // --- MENU LOGIC ---
 
         function renderDifficultyButtons() {
             const container = document.getElementById('difficultySelection');
@@ -604,20 +579,15 @@
 
             mainMenu.classList.add('hidden');
             gameContent.classList.remove('hidden');
-            document.getElementById('backToMenu').classList.remove('hidden'); // Show back button
+            document.getElementById('backToMenu').classList.remove('hidden');
 
-            // Get the label for the currently selected difficulty
             const difficultyLabel = difficulties[selectedDifficulty].label;
 
-            // Update the description paragraph with the difficulty label
             document.getElementById('gameDescription').innerText = `Difficulty: ${difficultyLabel} | Mines: ${mineCount}`;
 
             resetBoardState(false);
         }
 
-        // --- GAME LOGIC ---
-
-        // Checks if a tile is adjacent to a bomb.
         function isAdjacent(index) {
             for (const bombIndex of mineIndices) {
                 const row = Math.floor(index / gridSize);
@@ -634,26 +604,23 @@
             return false;
         }
 
-        // Places mines, excluding the first clicked tile
         function initializeMines(excludeIndex = -1) {
             mineIndices = [];
             const totalCells = gridSize * gridSize;
             const possibleMineIndices = new Set();
 
-            // 1. Fill Set with all possible indices, excluding the first clicked tile
             for (let i = 0; i < totalCells; i++) {
                 if (i !== excludeIndex) {
                     possibleMineIndices.add(i);
                 }
             }
 
-            // 2. Select 'mineCount' random indices from the Set
             const indicesArray = Array.from(possibleMineIndices);
             for (let i = 0; i < mineCount; i++) {
                 if (indicesArray.length === 0) break;
 
                 const randomIndex = Math.floor(Math.random() * indicesArray.length);
-                const selectedIndex = indicesArray.splice(randomIndex, 1)[0]; // Remove and get element
+                const selectedIndex = indicesArray.splice(randomIndex, 1)[0];
                 mineIndices.push(selectedIndex);
             }
         }
@@ -666,7 +633,7 @@
                 cell.classList.add("cell");
                 cell.dataset.index = i;
                 cell.addEventListener("click", (event) => {
-                    event.preventDefault(); // Prevents the element from being focused
+                    event.preventDefault();
                     revealCell(i);
                 });
                 grid.appendChild(cell);
@@ -676,7 +643,6 @@
         function revealBoardOnEnd() {
             document.querySelectorAll(".cell").forEach(c => {
                 const cIndex = parseInt(c.dataset.index);
-                // No need to recalculate isTileAdjacent if it's not used immediately.
 
                 if (mineIndices.includes(cIndex)) {
                     // Reveal mines
@@ -684,7 +650,6 @@
                     c.innerHTML = "💣";
                     c.style.transform = "rotateY(180deg)";
                 } else if (isAdjacent(cIndex) && !c.classList.contains("revealed")) {
-                    // Reveal adjacent safe tiles (yellow) if they haven't been revealed as a diamond
                     c.classList.add("safe");
                     c.innerHTML = "";
                     c.style.transform = "rotateY(180deg)";
@@ -695,7 +660,6 @@
         function revealCell(index) {
             if (gameEnded) return;
 
-            // Delay mine placement until the first click is made
             if (firstClick) {
                 initializeMines(index);
                 firstClick = false;
@@ -704,9 +668,9 @@
             const cell = document.querySelector(`.cell[data-index='${index}']`);
             if (!cell || cell.classList.contains("revealed") || cell.classList.contains("safe")) return;
 
-            cell.style.transform = "rotateY(180deg)"; //Flip animation
+            cell.style.transform = "rotateY(180deg)";
 
-            const isMine = mineIndices.includes(index); // Check against the mine array
+            const isMine = mineIndices.includes(index);
 
             if (isMine) {
                 revealBoardOnEnd();
@@ -724,7 +688,7 @@
                 checkEndGame();
 
                 if (gameEnded === false) {
-                    showResetButton(); // Show restart board option if player still has money
+                    showResetButton();
                 }
             } else if (isAdjacent(index)) {
                 cell.classList.add("safe");
@@ -748,7 +712,6 @@
             let totalDiamondTiles = 0;
             const totalCells = gridSize * gridSize;
 
-            // Loop through all cells to find the count of true diamond tiles
             for (let i = 0; i < totalCells; i++) {
                 if (!mineIndices.includes(i) && !isAdjacent(i)) {
                     totalDiamondTiles++;
@@ -781,95 +744,75 @@
                 gameEnded = true;
                 showEndResetButton();
                 freezeBoard();
-                applyBlur(); // Apply blur when game over screen is shown
+                applyBlur();
             }
         }
 
         function showResetButton() {
-            // Shows the "Restart Board" button if a mine was hit but the player still has money
             if (hitMine && gameEnded == false) {
                 document.getElementById("resetContainer").style.display = "block";
             }
         }
 
         function showEndResetButton() {
-            // Shows the "Play Again" and "Main Menu" buttons if the game is fully over (Win or zero cash loss)
             if (gameEnded) {
                 document.getElementById("endResetButton").classList.remove("hidden");
-                document.getElementById("endMenuButton").classList.remove("hidden"); // **NEW**
+                document.getElementById("endMenuButton").classList.remove("hidden");
                 document.getElementById("resetContainer").style.display = "none";
             }
         }
-
-        // Renamed and refactored the reset function for clarity and correct logic
+        
         function resetBoardState(goToMenu = true) { 
-            // Reset core game board state for a new round
             revealedCells = 0;
             gameEnded = false;
             hitMine = false;
             firstClick = true;
             mineIndices = [];
 
-            // Reset UI elements
             document.getElementById("status").innerText = `Money: $${balance}`;
             endScreen.classList.add("hidden");
             document.getElementById("resetContainer").style.display = "none";
             document.getElementById("endResetButton").classList.add("hidden");
-            document.getElementById("endMenuButton").classList.add("hidden"); // **NEW**
+            document.getElementById("endMenuButton").classList.add("hidden");
             document.querySelectorAll(".cell").forEach(cell => cell.style.pointerEvents = "auto");
             if (typeof myConfetti === 'function') { myConfetti.reset(); }
 
-            removeBlur(); // Always remove blur on reset
+            removeBlur();
 
-            // Go back to menu or restart game
             if (goToMenu) {
-                balance = 0; // Only reset balance if returning to the main menu
-                document.getElementById("status").innerText = `Money: $${balance}`; // Update status after balance reset
+                balance = 0;
+                document.getElementById("status").innerText = `Money: $${balance}`;
                 gameContent.classList.add('hidden');
                 mainMenu.classList.remove('hidden');
-                document.getElementById('backToMenu').classList.add('hidden'); // Hide back button
+                document.getElementById('backToMenu').classList.add('hidden');
             } else {
-                // This is where a game restart without going to the menu happens
                 createGrid(); 
             }
         }
 
         document.addEventListener('DOMContentLoaded', (event) => {
-            // Event Listeners for Game
-            // This is for the "Restart Board" button after hitting a mine but having money left
             document.getElementById("resetButton").addEventListener("click", () => {
-                // Call reset to clear the board state, then startGame to redraw with current difficulty
                 resetBoardState(false); 
                 startGame();
             });
 
-            // This is for the "Play Again" button after Game Over/Victory
             document.getElementById("endResetButton").addEventListener("click", () => {
-                // Call resetBoardState to clear the end screen/board, but DONT go to menu (false)
                 resetBoardState(false); 
-                // Restart the game using the current (and unchanged) difficulty settings
                 startGame();
             });
-
-            // **NEW** Event Listener for the "Main Menu" button on the end screen
+            
             document.getElementById("endMenuButton").addEventListener("click", () => {
-                // Call resetBoardState to clear the board and go back to the menu (true)
                 resetBoardState(true);
             });
 
-            // The back button should always return to menu and reset balance
             document.getElementById("backToMenu").addEventListener("click", () => resetBoardState(true)); 
-
-            // Event Listeners for Tutorial Modal
             document.getElementById("howToPlayBtn").addEventListener("click", openTutorial);
             document.getElementById("closeTutorialBtn").addEventListener("click", closeTutorial);
             document.getElementById("prevBtn").addEventListener("click", () => updateCarousel(-1));
-            // The Next button click handler was already correct, verifying it is attached here:
             document.getElementById("nextBtn").addEventListener("click", () => updateCarousel(1));
 
-            // Initial Menu Setup
             renderDifficultyButtons();
-            showSlide(currentSlide); // Initialize carousel display
+            showSlide(currentSlide);
         });
     </script>
 </body>
